@@ -12,6 +12,7 @@ import {
   CHANGE_PASSWORD_ENDPOINT,
   REFRESH_TOKEN_ENDPOINT,
 } from "@/services/constant/apiConfig";
+import { PayloadAction } from "@reduxjs/toolkit";
 
 export interface AuthState {
   user: User | null;
@@ -230,6 +231,22 @@ const authSlice = createSlice({
       localStorage.removeItem("token");
       localStorage.removeItem("refreshToken");
     },
+    clearAuthError: (state) => {
+      state.error = null;
+    },
+    // Add real-time lives update
+    updateUserLives: (state, action: PayloadAction<{ lives: number; livesDeducted?: boolean }>) => {
+      if (state.user) {
+        state.user.lives = action.payload.lives;
+        console.log(`🔄 Lives updated in real-time: ${action.payload.lives}`);
+      }
+    },
+    // Update user profile data
+    updateUserProfile: (state, action: PayloadAction<Partial<User>>) => {
+      if (state.user) {
+        state.user = { ...state.user, ...action.payload };
+      }
+    },
     setAvatar: (state, action) => {
       if (state.user) {
         state.user.avatar = action.payload;
@@ -418,5 +435,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, setAvatar, loginWithGoogle, resetLoginAttempts, incrementLoginAttempts } = authSlice.actions;
+export const { logout, clearAuthError, updateUserLives, updateUserProfile, setAvatar, loginWithGoogle, resetLoginAttempts, incrementLoginAttempts } = authSlice.actions;
 export default authSlice.reducer;

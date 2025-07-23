@@ -2,12 +2,10 @@ import { useState } from 'react';
 import { Layout, Menu, Button } from 'antd';
 import {
   DashboardOutlined,
-
-  TeamOutlined,
+  UserOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-
   BellOutlined,
   GiftOutlined,
 } from '@ant-design/icons';
@@ -30,6 +28,40 @@ const Sidebar = () => {
   };
 
   const getSelectedKeys = () => [location.pathname];
+
+  // Keep only essential admin functions:
+  // - Dashboard 
+  // - User Management
+  // - Package Management
+  // - Notifications
+  // Remove deprecated English learning management items
+
+  const adminMenuItems = [
+    {
+      key: "dashboard",
+      icon: <DashboardOutlined />,
+      label: "Dashboard",
+      path: "/admin",
+    },
+    {
+      key: "users",
+      icon: <UserOutlined />,
+      label: "Quản lý người dùng",
+      path: "/admin/manage-users",
+    },
+    {
+      key: "packages",
+      icon: <GiftOutlined />,
+      label: "Quản lý gói",
+      path: "/admin/packages",
+    },
+    {
+      key: "notifications",
+      icon: <BellOutlined />,
+      label: "Thông báo",
+      path: "/admin/notifications",
+    },
+  ];
 
   return (
     <Sider
@@ -83,25 +115,11 @@ const Sidebar = () => {
             fontFamily: "'Baloo 2', cursive"
           }}
         >
-          <Menu.Item key="/admin" icon={<DashboardOutlined />}>
-            <Link to="/admin">Dashboard</Link>
-          </Menu.Item>
-
-
-
-          <Menu.Item key="/admin/users" icon={<TeamOutlined />}>
-            <Link to="/admin/users">Manage User</Link>
-          </Menu.Item>
-
-          <Menu.SubMenu key="notifications" icon={<BellOutlined />} title={<span>Manage Notification</span>}>
-            <Menu.Item key="/admin/notifications/all" icon={<TeamOutlined />}>
-              <Link to="/admin/notifications/all">All User</Link>
+          {adminMenuItems.map((item) => (
+            <Menu.Item key={item.key} icon={item.icon}>
+              <Link to={item.path}>{item.label}</Link>
             </Menu.Item>
-          </Menu.SubMenu>
-
-          <Menu.Item key="/admin/packages" icon={<GiftOutlined />}>
-            <Link to="/admin/packages">Manage Package</Link>
-          </Menu.Item>
+          ))}
         </Menu>
       </div>
 

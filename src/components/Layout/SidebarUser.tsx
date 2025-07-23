@@ -8,8 +8,8 @@ import { SettingOutlined, TrophyOutlined, GiftOutlined, UserOutlined } from "@an
 const menuItems = [
     {
         icon: "https://d35aaqx5ub95lt.cloudfront.net/vendor/784035717e2ff1d448c0f6cc4efc89fb.svg",
-        label: "Học",
-        href: "/learn",
+        label: "Học Kinh tế Mác-Lê-Nin",
+        href: "/marxist-economics",
     },
     {
         iconElement: <TrophyOutlined style={{ fontSize: '24px', color: '#FFD700' }} />,

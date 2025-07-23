@@ -11,6 +11,7 @@ import ChangePasswordModal from "@/components/Modal/ChangePasswordModal";
 import { FaFire, FaHeart, FaCrown } from "react-icons/fa";
 import NotificationButton from "@/components/Notification/NotificationButton";
 import LevelUpModal from "@/components/Modal/LevelUpModal";
+import { HeartFilled } from '@ant-design/icons';
 
 function getStreakColor(streak: number) {
   if (streak >= 25) return "#b16cff";      // tím
@@ -98,6 +99,16 @@ const Header = () => {
     }
   };
 
+  const user = userProfile || authUser;
+  const currentLives = user?.lives || 0;
+  const maxLives = 5; // Default max lives
+  
+  useEffect(() => {
+    if (isAuthenticated && !userProfile) {
+      dispatch(fetchUserProfile());
+    }
+  }, [isAuthenticated, dispatch, userProfile]);
+
   const levelProgress = calculateLevelProgress(userProfile?.userLevel || 1, userProfile?.xp || 0);
 
   const items: MenuProps["items"] = [
@@ -136,6 +147,29 @@ const Header = () => {
           <Typography.Title level={2} style={{ margin: 0, color: "#dc2626" }} className="font-baloo">
             MarxEdu
           </Typography.Title>
+          
+          {/* Lives Display - Show only for authenticated users */}
+          {isAuthenticated && (
+            <div className="flex items-center space-x-1 bg-red-50 px-3 py-2 rounded-lg border border-red-200 ml-4">
+              <div className="flex items-center space-x-1">
+                {Array.from({ length: maxLives }, (_, index) => (
+                  <HeartFilled
+                    key={index}
+                    className={`text-lg transition-all duration-300 ${
+                      index < currentLives 
+                        ? 'text-red-500' 
+                        : 'text-gray-300'
+                    }`}
+                  />
+                ))}
+              </div>
+              <span className={`text-sm font-bold ml-2 ${
+                currentLives <= 1 ? 'text-red-600 animate-pulse' : currentLives <= 2 ? 'text-orange-600' : 'text-green-600'
+              }`}>
+                {currentLives}/{maxLives}
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="flex items-center gap-4">

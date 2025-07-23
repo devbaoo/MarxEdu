@@ -5,30 +5,32 @@ import storage from "redux-persist/lib/storage";
 import authReducer from "../features/auth/authSlice";
 
 import userReducer from "../features/user/userSlice";
-import topicReducer from "../features/topic/topicSlice";
-import lessonReducer from "../features/lesson/lessonSlice";
+// import topicReducer from "../features/topic/topicSlice"; // DEPRECATED - Use marxistReducer instead
+// import lessonReducer from "../features/lesson/lessonSlice"; // DEPRECATED - Use marxistReducer instead
 import adminReducer from "../features/admin/adminSlice";
-import levelReducer from "../features/level/levelSlice"; 
-import skillReducer from "../features/skill/skillSlice"; 
+// import levelReducer from "../features/level/levelSlice"; // DEPRECATED - Use marxistReducer instead
+// import skillReducer from "../features/skill/skillSlice"; // DEPRECATED - Use marxistReducer instead
 import packageReducer from "../features/package/packageSlice";
+import marxistReducer from "../features/marxist/marxistSlice";
 
 
 const presistConfig = {
   key: "root",
   storage,
-  whitelist: ["auth", "user", "lesson", "topic", "admin", "level", "skill", "package"],
+  whitelist: ["auth", "user", "admin", "package", "marxist"], // Removed deprecated: lesson, topic, level, skill
 };
 
 // Create a hook for using TypedUseSelectorHook
 const rootReducer = combineReducers({
   auth: authReducer,
   user: userReducer,
-  topic: topicReducer,
-  lesson: lessonReducer,
+  // topic: topicReducer, // DEPRECATED - Use marxist instead
+  // lesson: lessonReducer, // DEPRECATED - Use marxist instead
   admin: adminReducer,
-  level: levelReducer,
-  skill: skillReducer,
+  // level: levelReducer, // DEPRECATED - Use marxist instead
+  // skill: skillReducer, // DEPRECATED - Use marxist instead
   package: packageReducer,
+  marxist: marxistReducer,
   // Add other reducers here as needed
 });
 
