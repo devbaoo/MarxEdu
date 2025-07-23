@@ -18,18 +18,20 @@ import AdminDashboard from "@/page/Admin/AdminDashboard";
 import { Route, Routes, Navigate } from "react-router-dom";
 import Process from "@/components/Process/Process";
 import DonePage from "@/page/Choose/DoneChoose";
-import LearnPage from "@/page/User/LearnPage";
-import LessonPage from "@/page/User/LessonPage";
-import LessonSubmitPage from "@/page/User/LessonSubmitPage";
+// DEPRECATED: These pages now redirect to Marxist Economics
+// import LearnPage from "@/page/User/LearnPage";
+// import LessonPage from "@/page/User/LessonPage";
+// import LessonSubmitPage from "@/page/User/LessonSubmitPage";
 import ProfilePage from "@/page/User/ProfilePage";
 import { useSelector } from "react-redux";
 import { RootState } from "@/services/store/store";
 import ManageUserPage from "@/page/Admin/ManageUserPage";
-import SkillsPage from "@/page/Staff/SkillsPage";
-import LessonsPage from "@/page/Staff/LessonsPage";
-import LevelsPage from "@/page/Staff/LevelsPage";
-import SpeakingLessonPage from "@/page/Staff/SpeakingLessonPage";
-import TopicsLesson from "@/page/Staff/TopicsLesson";
+// Legacy English learning imports (deprecated)
+// import SkillsPage from "@/page/Staff/SkillsPage";
+// import LessonsPage from "@/page/Staff/LessonsPage";
+// import LevelsPage from "@/page/Staff/LevelsPage";
+// import SpeakingLessonPage from "@/page/Staff/SpeakingLessonPage";
+// import TopicsLesson from "@/page/Staff/TopicsLesson";
 import AdminPackage from "@/page/Admin/AdminPackage";
 import NotificationSettings from "@/page/User/NotificationSetting";
 import NotificationsAllPage from "@/page/Admin/NotificationsAllPage";
@@ -40,6 +42,13 @@ import Package from "@/page/User/Package";
 import PaymentReturn from "@/page/Payment/PaymentReturn";
 import PaymentCancel from "@/page/Payment/PaymentCancel";
 import HistoryPaymentPage from "@/page/User/HistoryPayment";
+import MarxistDashboard from "@/page/Marxist/MarxistDashboard";
+import MarxistTopicsPage from "@/page/Staff/MarxistTopicsPage";
+import MarxistLessonsPage from "@/page/Staff/MarxistLessonsPage";
+import MarxistStatsPage from "@/page/Staff/MarxistStatsPage";
+import GeminiTestPage from "@/page/Staff/GeminiTestPage";
+import MarxistLessonDetailPage from "@/page/Marxist/MarxistLessonDetailPage";
+import MarxistLessonTestPage from "@/page/Marxist/MarxistLessonTestPage";
 
 
 const AppRouter = () => {
@@ -56,7 +65,7 @@ const AppRouter = () => {
         if (user?.role === "staff") {
             return "/staff";
         }
-        return "/learn";
+        return "/marxist-economics";
     };
 
     return (
@@ -81,14 +90,18 @@ const AppRouter = () => {
             {/* User Routes - Only accessible when authenticated as user */}
             <Route element={<ProtectedRoute allowedRoles={["user"]} />}>
                 <Route element={<UserLayout />}>
-                    <Route path="/learn" element={<LearnPage />} />
-                    <Route path="/lesson/:id" element={<LessonPage />} />
-                    <Route path="/lesson/submit" element={<LessonSubmitPage />} />
+                    {/* DEPRECATED: Redirect old lesson routes to Marxist Economics */}
+                    <Route path="/learn" element={<Navigate to="/marxist-economics" replace />} />
+                    <Route path="/lesson/:id" element={<Navigate to="/marxist-economics" replace />} />
+                    <Route path="/lesson/submit" element={<Navigate to="/marxist-economics" replace />} />
                     <Route path="/profile" element={<ProfilePage />} />
                     <Route path="/history-payment" element={<HistoryPaymentPage />} />
                     <Route path="/setting" element={<NotificationSettings />} />
                     <Route path="/rank" element={<Rank />} />
                     <Route path="/packages" element={<Package />} />
+                    <Route path="/marxist-economics" element={<MarxistDashboard />} />
+                    <Route path="/marxist-lesson/:pathId" element={<MarxistLessonDetailPage />} />
+                    <Route path="/marxist-test/:pathId" element={<MarxistLessonTestPage />} />
                 </Route>
 
                 {/* Payment Routes */}
@@ -117,11 +130,10 @@ const AppRouter = () => {
             <Route element={<ProtectedRoute allowedRoles={["staff"]} />}>
                 <Route path="/staff" element={<StaffLayout />}>
                     <Route index element={<StaffDashboard />} />
-                    <Route path="skills" element={<SkillsPage />} />
-                    <Route path="topics" element={<TopicsLesson />} />
-                    <Route path="lesson" element={<LessonsPage />} />
-                    <Route path="levels" element={<LevelsPage />} />
-                    <Route path="speaking" element={<SpeakingLessonPage />} />
+                    <Route path="marxist-topics" element={<MarxistTopicsPage />} />
+                    <Route path="marxist-lessons" element={<MarxistLessonsPage />} />
+                    <Route path="marxist-stats" element={<MarxistStatsPage />} />
+                    <Route path="gemini-test" element={<GeminiTestPage />} />
                 </Route>
             </Route>
 

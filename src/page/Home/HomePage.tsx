@@ -18,7 +18,7 @@ const HomePage = () => {
         if (user?.level === null) {
           navigate("/choose-topic", { replace: true });
         } else {
-          navigate("/learn", { replace: true });
+          navigate("/marxist-economics", { replace: true });
         }
       }
     }

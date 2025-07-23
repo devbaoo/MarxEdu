@@ -1,20 +1,15 @@
 import { useState } from 'react';
 import { Layout, Menu, Button } from 'antd';
 import {
-
-
-
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  ReadOutlined,
+  BookOutlined,
 
-  TagsOutlined,
-  BulbOutlined,
-  RiseOutlined,
   DashboardOutlined,
-
-
+  ExperimentOutlined,
+  BarChartOutlined,
+  ReadOutlined
 } from '@ant-design/icons';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
@@ -35,6 +30,43 @@ const SidebarStaff = () => {
   };
 
   const getSelectedKeys = () => [location.pathname];
+
+  // Update menu items to focus on Marxist Economics only
+  // Remove deprecated items: Skills, Lessons, Levels, Speaking Lessons, Topics Lesson
+  // Keep only: Dashboard, Marxist Topics, Marxist Lessons, Marxist Stats, Gemini Test
+
+  const menuItems = [
+    {
+      key: "dashboard",
+      icon: <DashboardOutlined />,
+      label: "Dashboard",
+      path: "/staff",
+    },
+    {
+      key: "marxist-topics", 
+      icon: <BookOutlined />,
+      label: "Chủ đề Marxist",
+      path: "/staff/marxist-topics",
+    },
+    {
+      key: "marxist-lessons",
+      icon: <ReadOutlined />,
+      label: "Bài học Marxist", 
+      path: "/staff/marxist-lessons",
+    },
+    {
+      key: "marxist-stats",
+      icon: <BarChartOutlined />,
+      label: "Thống kê Marxist",
+      path: "/staff/marxist-stats",
+    },
+    {
+      key: "gemini-test",
+      icon: <ExperimentOutlined />,
+      label: "Gemini AI Test",
+      path: "/staff/gemini-test",
+    },
+  ];
 
   return (
     <Sider
@@ -69,7 +101,7 @@ const SidebarStaff = () => {
         />
         {!collapsed && (
           <div style={{ fontSize: 20, fontWeight: 'bold', color: 'white', fontFamily: "'Baloo 2', cursive" }}>
-            MarxEdu Staff
+            🚩 MarxEdu Staff
           </div>
         )}
       </div>
@@ -88,31 +120,11 @@ const SidebarStaff = () => {
             fontFamily: "'Baloo 2', cursive"
           }}
         >
-          <Menu.Item key="/staff" icon={<DashboardOutlined />}>
-            <Link to="/staff">Dashboard</Link>
-          </Menu.Item>
-
-
-          <Menu.Item key="/staff/topics" icon={<TagsOutlined />}>
-            <Link to="/staff/topics">Topics</Link>
-          </Menu.Item>
-          <Menu.Item key="/staff/skills" icon={<BulbOutlined />}>
-            <Link to="/staff/skills">Skills</Link>
-          </Menu.Item>
-          <Menu.Item key="/staff/lesson" icon={<ReadOutlined />}>
-            <Link to="/staff/lesson">Lesson</Link>
-          </Menu.Item>
-          <Menu.Item key="/staff/levels" icon={<RiseOutlined />}>
-            <Link to="/staff/levels">Levels</Link>
-          </Menu.Item>
-          {/* <Menu.Item key="/staff/speaking" icon={<AudioOutlined />}>
-              <Link to="/staff/speaking">Speaking</Link>
-            </Menu.Item> */}
-
-
-
-
-
+          {menuItems.map((item) => (
+            <Menu.Item key={item.key} icon={item.icon}>
+              <Link to={item.path}>{item.label}</Link>
+            </Menu.Item>
+          ))}
         </Menu>
       </div>
 

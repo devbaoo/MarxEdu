@@ -9,7 +9,7 @@ const DonePage = () => {
   const handleNavigate = () => {
     setIsLoading(true);
     setTimeout(() => {
-      navigate("/learn");
+      navigate("/marxist-economics");
     }, 1500);
   };
 

@@ -50,7 +50,7 @@ const removeToken = (): void => {
 // ========================
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: BASE_URL,
-  timeout: 10000,
+  timeout: 30000, // Increased from 10000ms to 30000ms (30 seconds) for large lesson data
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",

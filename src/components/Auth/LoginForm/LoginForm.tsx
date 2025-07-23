@@ -45,7 +45,7 @@ const LoginForm = forwardRef((_, ref) => {
         } else if (p && (!p.level || !p.preferredSkills || p.preferredSkills.length === 0)) {
             navigate("/choose-topic");
         } else {
-            navigate("/learn");
+            navigate("/marxist-economics");
         }
     };
 

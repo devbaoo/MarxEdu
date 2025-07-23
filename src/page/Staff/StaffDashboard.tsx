@@ -1,11 +1,21 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/services/store/store';
+import { Card, Row, Col, Button, Typography, Statistic } from 'antd';
+import { 
+  BookOutlined, 
+  BarChartOutlined, 
+  ExperimentOutlined, 
+  ReadOutlined,
+  UserOutlined,
+
+} from '@ant-design/icons';
+import { RootState, useAppSelector } from '@/services/store/store';
+
+const { Title, Text, Paragraph } = Typography;
 
 const StaffDashboard = () => {
     const navigate = useNavigate();
-    const { user } = useSelector((state: RootState) => state.auth);
+    const { user } = useAppSelector((state: RootState) => state.auth);
 
     useEffect(() => {
         if (user?.role !== 'staff') {
@@ -13,53 +23,142 @@ const StaffDashboard = () => {
         }
     }, [user, navigate]);
 
+    const quickStats = [
+        { title: 'Chủ đề Marxist', value: '10', icon: <BookOutlined /> },
+        { title: 'Bài học đã tạo', value: '45', icon: <ReadOutlined /> },
+        { title: 'Học viên hoạt động', value: '156', icon: <UserOutlined /> },
+        { title: 'Tỷ lệ hoàn thành', value: '78%', icon: <BarChartOutlined /> },
+    ];
+
     return (
-        <div className="p-8">
-            <h1 className="text-3xl font-bold text-gray-800 mb-6 font-baloo">Staff Dashboard</h1>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {/* Package Management Card */}
-                <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
-                    <h2 className="text-xl font-semibold text-gray-700 mb-4 font-baloo">Quản lý gói học</h2>
-                    <p className="text-gray-600 mb-4 font-baloo">Xem và quản lý các gói học phí của người dùng</p>
-                    <button
-                        onClick={() => navigate('/staff/packages')}
-                        className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-baloo"
-                    >
-                        Xem chi tiết
-                    </button>
-                </div>
-
-                {/* User Support Card */}
-                <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
-                    <h2 className="text-xl font-semibold text-gray-700 mb-4 font-baloo">Hỗ trợ người dùng</h2>
-                    <p className="text-gray-600 mb-4 font-baloo">Giải đáp thắc mắc và hỗ trợ người dùng</p>
-                    <button
-                        onClick={() => navigate('/staff/support')}
-                        className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors font-baloo"
-                    >
-                        Xem chi tiết
-                    </button>
-                </div>
-
-                {/* Analytics Card */}
-                <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
-                    <h2 className="text-xl font-semibold text-gray-700 mb-4 font-baloo">Thống kê</h2>
-                    <p className="text-gray-600 mb-4 font-baloo">Xem báo cáo và thống kê hoạt động</p>
-                    <button
-                        onClick={() => navigate('/staff/analytics')}
-                        className="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition-colors font-baloo"
-                    >
-                        Xem chi tiết
-                    </button>
-                </div>
+        <div className="p-6 max-w-7xl mx-auto">
+            {/* Header */}
+            <div className="mb-8">
+                <Title level={2} className="mb-2 text-red-700">
+                    🚩 Dashboard Giảng viên
+                </Title>
+                <Paragraph className="text-gray-600">
+                    Quản lý hệ thống học tập Kinh tế chính trị Mác-Lê-Nin
+                </Paragraph>
             </div>
+
+            {/* Quick Stats */}
+            <Row gutter={[24, 24]} className="mb-8">
+                {quickStats.map((stat, index) => (
+                    <Col xs={24} sm={12} md={6} key={index}>
+                        <Card>
+                            <Statistic
+                                title={stat.title}
+                                value={stat.value}
+                                prefix={stat.icon}
+                                valueStyle={{ color: '#dc2626' }}
+                            />
+                        </Card>
+                    </Col>
+                ))}
+            </Row>
+
+            {/* Management Cards */}
+            <Row gutter={[24, 24]} className="mb-8">
+                {/* Marxist Topics Management */}
+                <Col xs={24} sm={12} lg={6}>
+                    <Card 
+                        hoverable
+                        className="h-full"
+                        bodyStyle={{ padding: '24px', textAlign: 'center' }}
+                    >
+                        <BookOutlined className="text-4xl text-red-600 mb-4" />
+                        <Title level={4} className="mb-3">Chủ đề Marxist</Title>
+                        <Text type="secondary" className="block mb-4">
+                            Quản lý các chủ đề kinh tế chính trị Mác-Lê-Nin
+                        </Text>
+                        <Button 
+                            type="primary"
+                            className="bg-red-600 hover:bg-red-700"
+                            onClick={() => navigate('/staff/marxist-topics')}
+                        >
+                            Quản lý chủ đề
+                        </Button>
+                    </Card>
+                </Col>
+
+                {/* AI Lessons Management */}
+                <Col xs={24} sm={12} lg={6}>
+                    <Card 
+                        hoverable
+                        className="h-full"
+                        bodyStyle={{ padding: '24px', textAlign: 'center' }}
+                    >
+                        <ReadOutlined className="text-4xl text-blue-600 mb-4" />
+                        <Title level={4} className="mb-3">Bài học AI</Title>
+                        <Text type="secondary" className="block mb-4">
+                            Xem và quản lý các bài học được tạo bởi AI
+                        </Text>
+                        <Button 
+                            type="primary"
+                            className="bg-blue-600 hover:bg-blue-700"
+                            onClick={() => navigate('/staff/marxist-lessons')}
+                        >
+                            Xem bài học
+                        </Button>
+                    </Card>
+                </Col>
+
+                {/* Learning Statistics */}
+                <Col xs={24} sm={12} lg={6}>
+                    <Card 
+                        hoverable
+                        className="h-full"
+                        bodyStyle={{ padding: '24px', textAlign: 'center' }}
+                    >
+                        <BarChartOutlined className="text-4xl text-green-600 mb-4" />
+                        <Title level={4} className="mb-3">Thống kê học tập</Title>
+                        <Text type="secondary" className="block mb-4">
+                            Báo cáo tiến độ học tập của học viên
+                        </Text>
+                        <Button 
+                            type="primary"
+                            className="bg-green-600 hover:bg-green-700"
+                            onClick={() => navigate('/staff/marxist-stats')}
+                        >
+                            Xem thống kê
+                        </Button>
+                    </Card>
+                </Col>
+
+                {/* Gemini AI Testing */}
+                <Col xs={24} sm={12} lg={6}>
+                    <Card 
+                        hoverable
+                        className="h-full"
+                        bodyStyle={{ padding: '24px', textAlign: 'center' }}
+                    >
+                        <ExperimentOutlined className="text-4xl text-purple-600 mb-4" />
+                        <Title level={4} className="mb-3">Test Gemini AI</Title>
+                        <Text type="secondary" className="block mb-4">
+                            Kiểm tra kết nối và hoạt động của AI
+                        </Text>
+                        <Button 
+                            type="primary"
+                            className="bg-purple-600 hover:bg-purple-700"
+                            onClick={() => navigate('/staff/gemini-test')}
+                        >
+                            Test AI
+                        </Button>
+                    </Card>
+                </Col>
+            </Row>
 
             {/* Welcome Message */}
-            <div className="mt-8 bg-gradient-to-r from-red-600 to-red-700 rounded-xl p-6 text-white">
-                <h2 className="text-2xl font-bold mb-2 font-baloo">Chào mừng, {user?.firstName}!</h2>
-                <p className="font-baloo">Đây là trang quản lý dành cho nhân viên. Bạn có thể sử dụng các tính năng trên để hỗ trợ người dùng và quản lý hệ thống.</p>
-            </div>
+            <Card className="bg-gradient-to-r from-red-600 to-red-700 text-white border-0">
+                <Title level={3} className="text-white mb-3">
+                    🌟 Chào mừng, {user?.firstName}!
+                </Title>
+                <Paragraph className="text-white text-lg mb-0">
+                    Bạn đang quản lý hệ thống học tập Kinh tế chính trị Mác-Lê-Nin. 
+                    Sử dụng các công cụ trên để hỗ trợ học viên và phát triển nội dung học tập chất lượng cao.
+                </Paragraph>
+            </Card>
         </div>
     );
 };
