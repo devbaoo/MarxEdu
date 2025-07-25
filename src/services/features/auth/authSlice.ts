@@ -238,7 +238,27 @@ const authSlice = createSlice({
     updateUserLives: (state, action: PayloadAction<{ lives: number; livesDeducted?: boolean }>) => {
       if (state.user) {
         state.user.lives = action.payload.lives;
-        console.log(`🔄 Lives updated in real-time: ${action.payload.lives}`);
+        console.log('🔄 Updated user lives in auth state:', action.payload.lives);
+      }
+    },
+
+    // Update user XP and level
+    updateUserXPAndLevel: (state, action: PayloadAction<{ 
+      xp?: number; 
+      userLevel?: number; 
+      earnedXP?: number 
+    }>) => {
+      if (state.user) {
+        if (typeof action.payload.xp === 'number') {
+          state.user.xp = action.payload.xp;
+        }
+        if (typeof action.payload.userLevel === 'number') {
+          state.user.userLevel = action.payload.userLevel;
+        }
+        console.log('🎯 Updated user XP/Level:', {
+          xp: state.user.xp,
+          level: state.user.userLevel
+        });
       }
     },
     // Update user profile data
@@ -435,5 +455,15 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, clearAuthError, updateUserLives, updateUserProfile, setAvatar, loginWithGoogle, resetLoginAttempts, incrementLoginAttempts } = authSlice.actions;
+export const { 
+  logout, 
+  clearAuthError, 
+  updateUserLives,
+  updateUserXPAndLevel,
+  updateUserProfile, 
+  setAvatar, 
+  loginWithGoogle, 
+  resetLoginAttempts, 
+  incrementLoginAttempts 
+} = authSlice.actions;
 export default authSlice.reducer;

@@ -1,6 +1,20 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Card, Button, Spin, Alert, Row, Col, Typography, Progress, Tag } from 'antd';
-import { BookOutlined, TrophyOutlined, FireOutlined, BulbOutlined, SettingOutlined, RocketOutlined, EyeOutlined, ReloadOutlined, CheckCircleOutlined, StarOutlined, BarChartOutlined, LockOutlined } from '@ant-design/icons';
+import {
+  BookOutlined,
+  TrophyOutlined,
+  CheckCircleOutlined,
+  RocketOutlined,
+  BarChartOutlined,
+  WarningOutlined,
+  SettingOutlined,
+  FireOutlined,
+  BulbOutlined,
+  StarOutlined,
+  EyeOutlined,
+  ReloadOutlined,
+  LockOutlined
+} from '@ant-design/icons';
 import { RootState, useAppDispatch, useAppSelector } from '@/services/store/store';
 import {
   getMarxistLearningPath,
@@ -10,11 +24,13 @@ import {
   clearMarxistSuccess
 } from '@/services/features/marxist/marxistSlice';
 import { IMarxistLearningPath, IMarxistTopicStats } from '@/interfaces/IMarxist';
+import { useNavigate } from 'react-router-dom';
 
 const { Title, Text, Paragraph } = Typography;
 
 const MarxistDashboard: React.FC = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const {
     learningPath,
     learningPathLoading,
@@ -60,6 +76,13 @@ const MarxistDashboard: React.FC = () => {
   const handleGenerateLesson = async (options = {}) => {
     try {
       console.log('🚀 Generating new Marxist lesson...');
+      console.log('📊 Current learning path state:', {
+        totalLessons: learningPath.length,
+        completedLessons: learningPath.filter(p => p.completed).length,
+        hasIncompleteLesson: hasIncompleteLesson,
+        canGenerate: !hasIncompleteLesson
+      });
+      
       const result = await dispatch(generateMarxistLesson(options)).unwrap();
       console.log('✅ Lesson generated successfully:', result);
 
@@ -142,6 +165,18 @@ const MarxistDashboard: React.FC = () => {
     error.includes('No topics') ||
     error.includes('Admin cần seed dữ liệu')
   );
+
+  // 🚫 Check if user has incomplete lessons (should not create new ones)
+  const hasIncompleteLesson = useMemo(() => {
+    // Only disable if there are lessons AND at least one is incomplete
+    // If learningPath is empty or all completed, allow creating new lessons
+    return learningPath.length > 0 && learningPath.some(path => !path.completed);
+  }, [learningPath]);
+
+  // 📊 Get the most recent incomplete lesson
+  const nextIncompleteLesson = useMemo(() => {
+    return learningPath.find(path => !path.completed);
+  }, [learningPath]);
 
   return (
     <div className="marxist-dashboard p-6 max-w-7xl mx-auto">
@@ -280,15 +315,15 @@ const MarxistDashboard: React.FC = () => {
           AI sẽ phân tích tiến độ học tập của bạn và tạo ra bài học phù hợp nhất với trình độ hiện tại.
         </Paragraph>
         <Button
-          type="primary"
+          type="primary" 
           size="large"
-          loading={lessonGenerating}
-          onClick={() => handleGenerateLesson()}
-          className="bg-red-600 hover:bg-red-700"
-          disabled={!!isTopicError}
           icon={<RocketOutlined />}
+          onClick={handleGenerateLesson}
+          loading={lessonGenerating}
+          disabled={lessonGenerating || hasIncompleteLesson}
+          className="bg-gradient-to-r from-blue-500 to-purple-600 border-0 hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl"
         >
-          Tạo bài học mới với AI
+          {lessonGenerating ? 'AI đang tạo...' : 'Tạo bài học mới với AI'}
         </Button>
       </Card>
 
@@ -483,6 +518,29 @@ const MarxistDashboard: React.FC = () => {
                 </Card>
               );
             })}
+            {hasIncompleteLesson && nextIncompleteLesson && (
+              <Alert
+                type="info"
+                showIcon
+                className="mt-4"
+                message="Hoàn thành bài học hiện tại trước"
+                description={
+                  <div>
+                    <p className="mb-2">
+                      Bạn có <strong>bài học chưa hoàn thành</strong>. Hãy hoàn thành trước khi tạo bài mới.
+                    </p>
+                    <Button
+                      type="link"
+                      size="small"
+                      className="p-0 h-auto"
+                      onClick={() => navigate(`/marxist-lesson/${nextIncompleteLesson.pathId}`)}
+                    >
+                      📚 Học ngay: {nextIncompleteLesson.title}
+                    </Button>
+                  </div>
+                }
+              />
+            )}
           </div>
         )}
       </Card>

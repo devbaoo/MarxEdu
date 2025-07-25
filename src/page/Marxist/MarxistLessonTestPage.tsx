@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, Button, Typography, Row, Col, Tag, Spin, Alert, Radio, Progress, Modal } from 'antd';
 import {
   ArrowLeftOutlined,
@@ -9,7 +9,7 @@ import {
 } from '@ant-design/icons';
 import { RootState, useAppDispatch, useAppSelector } from '@/services/store/store';
 import { getMarxistLessonByPath, completeMarxistLesson, retryMarxistLesson, generateMarxistLesson, getMarxistLearningPath } from '@/services/features/marxist/marxistSlice';
-import { updateUserLives } from '@/services/features/auth/authSlice';
+import { updateUserLives, updateUserXPAndLevel } from '@/services/features/auth/authSlice';
 import { ILesson, IQuestion } from '@/interfaces/ILesson';
 import { shuffleQuestions, shuffleAllQuestionOptions } from '@/lib/utils';
 
@@ -23,10 +23,12 @@ interface Answer {
 const MarxistLessonTestPage: React.FC = () => {
   const { pathId } = useParams<{ pathId: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const dispatch = useAppDispatch();
-  const searchParams = new URLSearchParams(window.location.search);
+
+  // 🔄 Detect if this is a retry request from URL parameter
   const isRetry = searchParams.get('retry') === 'true';
-  
+
   const { error } = useAppSelector((state: RootState) => state.marxist);
   const [lesson, setLesson] = useState<ILesson | null>(null);
   const [lessonLoading, setLessonLoading] = useState(false);
@@ -154,93 +156,195 @@ const MarxistLessonTestPage: React.FC = () => {
       answers
     });
 
+    // 📊 Collect question results for progress tracking (Match backend schema)
+    const questionResults = lesson?.questions?.map((question) => {
+      const userAnswer = answers.find(a => a.questionId === question._id);
+      const correctAnswer = question.correctAnswer || '';
+      const isCorrect = userAnswer?.selectedAnswer === correctAnswer;
+      const questionScore = isCorrect ? (question.score || 100) : 0;
+      
+      return {
+        questionId: question._id,
+        answer: userAnswer?.selectedAnswer || '', // Backend expects 'answer', not 'userAnswer'
+        isCorrect,
+        score: questionScore,
+        isTimeout: false, // Default values for backend schema compliance
+        transcription: null,
+        feedback: null
+      };
+    }) || [];
+
+    console.log('📊 Question results for backend:', questionResults);
+
+    const lessonId = (lesson as unknown as {id?: string}).id || lesson?._id;
+    if (!lessonId) {
+      throw new Error('Không tìm thấy lesson ID');
+    }
+
     try {
-      // Call complete lesson API - this will auto-generate next lesson if score >= 70
-      const lessonId = lesson?._id || (lesson as unknown as {id?: string})?.id;
-      
-      console.log('🔍 Debugging lesson object:', {
-        lesson: lesson,
-        lessonId: lessonId,
-        lesson_id_field: lesson?._id,
-        lesson_id_alt: (lesson as unknown as {id?: string})?.id,
-        available_fields: lesson ? Object.keys(lesson) : 'no lesson'
-      });
-      
-      if (lessonId) {
-        console.log('🔄 Completing lesson with score:', score);
-        console.log('📋 Lesson data:', {
-          lessonId: lessonId,
-          score: score,
-          pathId: pathId,
-          lessonTitle: lesson?.title
+      console.log('📤 Calling completeMarxistLesson API...');
+      const result = await dispatch(completeMarxistLesson({ 
+        lessonId,
+        score,
+        questionResults // Send question results to backend
+      })).unwrap();
+
+      console.log('✅ Lesson completed successfully:', result);
+
+      // 🔥 UPDATE LIVES AND XP IN REAL-TIME after completion
+      if (typeof result.currentLives === 'number') {
+        dispatch(updateUserLives({ 
+          lives: result.currentLives,
+          livesDeducted: result.livesDeducted 
+        }));
+        console.log('🔄 Lives updated after completion:', result.currentLives);
+      }
+
+      // 🎯 UPDATE USER XP AND LEVEL if earned
+      if (result.earnedXP > 0 || result.leveledUp) {
+        dispatch(updateUserXPAndLevel({
+          xp: result.currentXP,
+          userLevel: result.newLevel,
+          earnedXP: result.earnedXP
+        }));
+        console.log('🎯 Updated XP/Level in auth state:', {
+          xp: result.currentXP,
+          level: result.newLevel,
+          earned: result.earnedXP
         });
         
-        // Add a small delay to ensure all data is ready
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        const completeResult = await dispatch(completeMarxistLesson({
-          lessonId: lessonId,
-          score: score
-        })).unwrap();
+        // 🏆 TRIGGER LEADERBOARD REFRESH via custom event
+        console.log('🏆 Triggering leaderboard refresh after XP/level update...');
+        window.dispatchEvent(new CustomEvent('refreshLeaderboard', {
+          detail: { 
+            newScore: result.scoreAchieved,
+            earnedXP: result.earnedXP,
+            newLevel: result.newLevel
+          }
+        }));
+      }
 
-        console.log('✅ Lesson completed successfully:', completeResult);
-
-        // 🔥 UPDATE LIVES IN REAL-TIME
-        if (typeof completeResult.currentLives === 'number') {
-          dispatch(updateUserLives({ 
-            lives: completeResult.currentLives,
-            livesDeducted: completeResult.livesDeducted 
-          }));
-          console.log('🔄 Lives updated in real-time:', completeResult.currentLives);
-        }
-
-        // Show success modal with different messages based on score
-        const passedTest = score >= 70;
-
-        Modal.success({
-          title: passedTest ? '🎉 Chúc mừng! Bạn đã vượt qua bài kiểm tra!' : '📚 Hoàn thành bài kiểm tra',
-          content: (
-            <div>
-              <p><strong>Điểm số:</strong> {score}/100</p>
-              <p><strong>Số câu đúng:</strong> {correctCount}/{totalQuestions}</p>
-              
-              {passedTest ? (
-                <div className="mt-4 p-3 bg-green-50 rounded">
-                  <p className="text-green-700">✅ <strong>Xuất sắc!</strong> Bạn đã đạt {score}% (≥70%)</p>
-                  <p className="text-blue-700">🤖 <strong>Đang tạo bài học mới với AI...</strong> Vui lòng chờ một chút!</p>
-                </div>
-              ) : (
-                <div className="mt-4 p-3 bg-yellow-50 rounded">
-                  <p className="text-yellow-700">📖 <strong>Cần ôn tập thêm!</strong> Điểm cần thiết: ≥70%</p>
-                  <p className="text-gray-600">💡 Hãy xem lại lý thuyết và thử lại bài học này.</p>
-                </div>
-              )}
+      // Show success modal with results
+      Modal.success({
+        title: result.passed ? '🎉 Chúc mừng! Bạn đã vượt qua!' : '📊 Kết quả bài kiểm tra',
+        width: 500,
+        content: (
+          <div className="space-y-4">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-green-600 mb-2">
+                {score}/100 điểm
+              </div>
+              <div className="text-lg text-gray-600">
+                Đúng {correctCount}/{totalQuestions} câu
+              </div>
             </div>
-          ),
-          width: 500,
-          onOk: async () => {
-            // 🚀 CLIENT-SIDE AUTO-GENERATION for passed tests
-            if (passedTest) {
+            
+            {/* XP and Level Information */}
+            {result.earnedXP > 0 && (
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-2xl">⭐</span>
+                  <span className="font-semibold text-blue-800">
+                    +{result.earnedXP} XP
+                  </span>
+                </div>
+                
+                {result.leveledUp ? (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">🎉</span>
+                      <span className="font-bold text-purple-600">
+                        Lên Level {result.newLevel}!
+                      </span>
+                    </div>
+                    {result.livesFromLevelUp > 0 && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-red-500">❤️</span>
+                        <span className="text-sm text-gray-600">
+                          +{result.livesFromLevelUp} life từ level up
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-1">
+                    <div className="text-sm text-gray-600">
+                      XP hiện tại: {result.currentXP}/{result.nextLevelRequiredXP}
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div 
+                        className="bg-blue-500 h-2 rounded-full transition-all duration-500"
+                        style={{ 
+                          width: `${Math.min((result.currentXP / result.nextLevelRequiredXP) * 100, 100)}%` 
+                        }}
+                      ></div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Lives Information */}
+            {result.livesDeducted && (
+              <div className="bg-red-50 p-3 rounded-lg">
+                <div className="flex items-center gap-2 text-red-600">
+                  <span>💔</span>
+                  <span className="text-sm">
+                    Đã trừ 1 life (còn {result.currentLives})
+                  </span>
+                </div>
+              </div>
+            )}
+            
+            {/* Auto-generation info */}
+            {result.passed && (
+              <div className="bg-green-50 p-3 rounded-lg">
+                <div className="flex items-center gap-2 text-green-600">
+                  <span>🤖</span>
+                  <span className="text-sm">
+                    AI đang tạo bài học tiếp theo...
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+        ),
+        onOk: async () => {
+          // 🚀 CLIENT-SIDE AUTO-GENERATION for passed tests
+          if (result.passed) {
+            try {
+              console.log('🤖 Auto-generating next lesson after successful completion...');
+              const generateResult = await dispatch(generateMarxistLesson({})).unwrap();
+              console.log('✅ Next lesson auto-generated:', generateResult);
+              
+              // 🔄 FORCE REFRESH learning path after successful generation
+              console.log('🔄 Force refreshing learning path after AI generation...');
+              await dispatch(getMarxistLearningPath({})).unwrap();
+              console.log('✅ Learning path refreshed successfully');
+              
+            } catch (genError) {
+              console.warn('⚠️ Failed to auto-generate next lesson:', genError);
+              // Still refresh learning path even if generation failed
               try {
-                console.log('🤖 Auto-generating next lesson after successful completion...');
-                const generateResult = await dispatch(generateMarxistLesson({})).unwrap();
-                console.log('✅ Next lesson auto-generated:', generateResult);
-              } catch (genError) {
-                console.warn('⚠️ Failed to auto-generate next lesson:', genError);
-                // Don't block user, just continue to dashboard
+                await dispatch(getMarxistLearningPath({})).unwrap();
+              } catch (refreshError) {
+                console.warn('⚠️ Failed to refresh learning path:', refreshError);
               }
             }
-            
-            // Always refresh and navigate back
-            dispatch(getMarxistLearningPath({}));
-            navigate('/marxist-economics');
+          } else {
+            // 🔄 Always refresh learning path for failed attempts too
+            try {
+              await dispatch(getMarxistLearningPath({})).unwrap();
+              console.log('✅ Learning path refreshed after failed attempt');
+            } catch (refreshError) {
+              console.warn('⚠️ Failed to refresh learning path:', refreshError);
+            }
           }
-        });
-
-      } else {
-        console.error('❌ No lesson ID found in lesson object:', lesson);
-        throw new Error('Không tìm thấy lesson ID - lesson object có thể bị lỗi structure');
-      }
+          
+          // Navigate back to dashboard
+          navigate('/marxist-economics');
+        }
+      });
 
     } catch (error) {
       console.error('❌ Error completing lesson:', error);
