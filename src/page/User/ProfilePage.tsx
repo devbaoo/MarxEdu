@@ -2,8 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/services/store/store";
 import { fetchUserProfile, uploadAvatar, updateProfile } from "@/services/features/user/userSlice";
 import Sidebar from "@/components/Layout/SidebarUser";
-import { FaPlus, FaMedal, FaStar, FaBullseye, FaUserGraduate, FaHeart, FaCamera, FaCrown, FaGift, FaUser, FaEdit } from "react-icons/fa";
-import { TbVocabulary } from "react-icons/tb";
+import { FaPlus, FaMedal, FaStar, FaUserGraduate, FaHeart, FaCamera, FaCrown, FaGift, FaUser, FaEdit } from "react-icons/fa";
 import { message, Input, Button } from "antd";
 import { ActivePackage } from "@/interfaces/IUser";
 
@@ -297,20 +296,6 @@ const ProfilePage = () => {
                                         <FaUserGraduate className="text-orange-500 text-xl sm:text-2xl mb-1" />
                                         <div className="font-baloo text-sm sm:text-base text-gray-700">Trình độ</div>
                                         <div className="font-bold text-base sm:text-lg text-gray-800 capitalize">{profile.level}</div>
-                                    </div>
-                                    <div className={`${cardColor} p-3 sm:p-4 flex flex-col items-center hover:shadow-md transition-shadow`}>
-                                        <TbVocabulary className="text-red-600 text-xl sm:text-2xl mb-1" />
-                                        <div className="font-baloo text-sm sm:text-base text-gray-700">Từ vựng đã hoàn thành</div>
-                                        <div className="font-bold text-base sm:text-lg text-gray-800">{profile.completedBasicVocab?.length || 0}</div>
-                                    </div>
-                                    <div className={`${cardColor} p-3 sm:p-4 flex flex-col items-center hover:shadow-md transition-shadow`}>
-                                        <FaBullseye className="text-purple-500 text-xl sm:text-2xl mb-1" />
-                                        <div className="font-baloo text-sm sm:text-base text-gray-700">Kỹ năng ưu tiên</div>
-                                        <div className="font-bold text-base sm:text-lg text-gray-800 capitalize">
-                                            {(profile.preferredSkills && profile.preferredSkills.length > 0)
-                                                ? profile.preferredSkills.join(", ")
-                                                : "Chưa chọn"}
-                                        </div>
                                     </div>
                                 </div>
                             </div>
