@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Card, Button, Spin, Alert, Row, Col, Typography, Progress, Tag } from 'antd';
-import { BookOutlined, TrophyOutlined, FireOutlined, BulbOutlined, SettingOutlined, RocketOutlined, EyeOutlined, ReloadOutlined, CheckCircleOutlined, StarOutlined, BarChartOutlined, LockOutlined } from '@ant-design/icons';
+import { BookOutlined, TrophyOutlined, FireOutlined, BulbOutlined, SettingOutlined, RocketOutlined, EyeOutlined, ReloadOutlined, CheckCircleOutlined, StarOutlined, BarChartOutlined, LockOutlined ,WarningOutlined } from '@ant-design/icons';
 import { RootState, useAppDispatch, useAppSelector } from '@/services/store/store';
 import {
   getMarxistLearningPath,
