@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState, useImperativeHandle, forwardRef } from "react";
 import { Typography, Spin, Avatar } from "antd";
 import { UserOutlined, CrownFilled } from "@ant-design/icons";
 import { useSelector } from "react-redux";
@@ -25,6 +25,10 @@ interface RankUser {
     totalScore: number;
     completedLessons: number;
     email?: string;
+}
+
+export interface RankRef {
+    refreshLeaderboard: () => Promise<void>;
 }
 
 const InfoBox = () => (
@@ -100,7 +104,7 @@ const EarnPointsBox = () => {
     );
 };
 
-const Rank: React.FC = () => {
+const Rank = forwardRef<RankRef, Record<string, never>>((_props, ref) => {
     const [loading, setLoading] = useState(false);
     const [leaderboardData, setLeaderboardData] = useState<RankUser[]>([]);
     const currentUser = useSelector((state: RootState) => state.user.profile) as UserProfile | null;
@@ -113,22 +117,41 @@ const Rank: React.FC = () => {
         return top3.some(user => user._id === userId);
     };
 
-    useEffect(() => {
-        const fetchLeaderboard = async () => {
-            setLoading(true);
-            try {
-                const { data } = await apiMethods.get<ApiResponse<RankUser[]>>(GET_LEADERBOARD_ENDPOINT);
-                if (data.success && Array.isArray(data.data)) {
-                    setLeaderboardData(data.data);
-                }
-            } catch (error) {
-                console.error('Error fetching leaderboard:', error);
-            } finally {
-                setLoading(false);
+    const fetchLeaderboard = async () => {
+        setLoading(true);
+        try {
+            console.log('🏆 Fetching leaderboard data...');
+            const { data } = await apiMethods.get<ApiResponse<RankUser[]>>(GET_LEADERBOARD_ENDPOINT);
+            if (data.success && Array.isArray(data.data)) {
+                setLeaderboardData(data.data);
+                console.log('✅ Leaderboard updated:', data.data.length, 'users');
             }
+        } catch (error) {
+            console.error('❌ Error fetching leaderboard:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Expose refresh function to parent components
+    useImperativeHandle(ref, () => ({
+        refreshLeaderboard: fetchLeaderboard
+    }));
+
+    useEffect(() => {
+        fetchLeaderboard();
+        
+        // 🏆 Listen for leaderboard refresh events from lesson completion
+        const handleRefreshLeaderboard = (event: CustomEvent) => {
+            console.log('🏆 Received leaderboard refresh event:', event.detail);
+            fetchLeaderboard();
         };
 
-        fetchLeaderboard();
+        window.addEventListener('refreshLeaderboard', handleRefreshLeaderboard as EventListener);
+        
+        return () => {
+            window.removeEventListener('refreshLeaderboard', handleRefreshLeaderboard as EventListener);
+        };
     }, []);
 
     const top3 = leaderboardData.slice(0, 3);
@@ -411,6 +434,8 @@ const Rank: React.FC = () => {
             </div>
         </div>
     );
-};
+});
+
+Rank.displayName = 'Rank';
 
 export default Rank;

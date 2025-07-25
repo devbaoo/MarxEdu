@@ -70,16 +70,21 @@ export interface IMarxistLearningPath {
   createdAt: string;
 }
 
+// Learning path response interface
 export interface IMarxistLearningPathResponse {
-  success: boolean;
-  message: string;
-  learningPath: IMarxistLearningPath[];
-  pagination: {
-    currentPage: number;
-    totalPages: number;
-    totalItems: number;
-    pageSize: number;
-  };
+    success: boolean;
+    statusCode: number;
+    message: string;
+    learningPath: IMarxistLearningPath[];
+    pagination: {
+        currentPage: number;
+        totalPages: number;
+        totalItems: number;
+        pageSize: number;
+    };
+    // New field for first-time users
+    needsFirstLesson?: boolean;
+    availableTopics?: number;
 }
 
 // Marxist Lesson Generation Interfaces
@@ -154,21 +159,43 @@ export interface IMarxistProgressAnalysisResponse {
 
 // Complete Lesson Interfaces
 export interface ICompleteMarxistLessonData {
-  lessonId: string;
-  score: number;
+    lessonId: string;
+    score: number;
+    questionResults?: Array<{
+        questionId: string;
+        answer: string; // Backend expects 'answer', not 'userAnswer'
+        isCorrect: boolean;
+        score: number;
+        isTimeout?: boolean;
+        transcription?: string | null;
+        feedback?: string | null;
+    }>;
 }
 
+// Complete lesson response interface
 export interface ICompleteMarxistLessonResponse {
-  success: boolean;
-  statusCode: number;
-  message: string;
-  pathUpdated?: boolean;
-  completed?: boolean;
-  nextLessonGenerated?: boolean;
-  livesDeducted?: boolean;
-  currentLives?: number;
-  scoreAchieved?: number;
-  passed?: boolean;
+    success: boolean;
+    statusCode: number;
+    message: string;
+    pathUpdated: boolean;
+    completed: boolean;
+    nextLessonGenerated: boolean;
+    // Lives system
+    livesDeducted: boolean;
+    currentLives: number;
+    // Score info
+    scoreAchieved: number;
+    passed: boolean;
+    // XP & Level system
+    earnedXP: number;
+    leveledUp: boolean;
+    newLevel: number;
+    livesFromLevelUp: number;
+    currentXP: number;
+    nextLevelRequiredXP: number;
+    // Progress system (NEW)
+    progressId: string;
+    progressStatus: 'COMPLETE' | 'FAILED';
 }
 
 // Gemini Connection Test Interface
