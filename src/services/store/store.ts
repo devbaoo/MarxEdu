@@ -11,13 +11,13 @@ import adminReducer from "../features/admin/adminSlice";
 // import levelReducer from "../features/level/levelSlice"; // DEPRECATED - Use marxistReducer instead
 // import skillReducer from "../features/skill/skillSlice"; // DEPRECATED - Use marxistReducer instead
 import packageReducer from "../features/package/packageSlice";
-import marxistReducer from "../features/marxist/marxistSlice";
+import philosophyReducer from "../features/marxist/philosophySlice";
 
 
 const presistConfig = {
   key: "root",
   storage,
-  whitelist: ["auth", "user", "admin", "package", "marxist"], // Removed deprecated: lesson, topic, level, skill
+  whitelist: ["auth", "user", "admin", "package", "philosophy"], // Removed deprecated: lesson, topic, level, skill, marxist
 };
 
 // Create a hook for using TypedUseSelectorHook
@@ -30,7 +30,7 @@ const rootReducer = combineReducers({
   // level: levelReducer, // DEPRECATED - Use marxist instead
   // skill: skillReducer, // DEPRECATED - Use marxist instead
   package: packageReducer,
-  marxist: marxistReducer,
+  philosophy: philosophyReducer,
   // Add other reducers here as needed
 });
 

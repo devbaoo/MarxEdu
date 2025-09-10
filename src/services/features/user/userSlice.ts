@@ -35,8 +35,9 @@ export const fetchUserProfile = createAsyncThunk(
         GET_PROFILE_TOKEN_ENDPOINT
       );
       return response.data.user;
-    } catch (error: any) {
-      return rejectWithValue(error.message || "Failed to fetch profile");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to fetch profile";
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -50,8 +51,9 @@ export const uploadAvatar = createAsyncThunk(
         formData
       );
       return response.data.user;
-    } catch (error: any) {
-      return rejectWithValue(error.message || "Failed to upload avatar");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to upload avatar";
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -65,8 +67,9 @@ export const updateProfile = createAsyncThunk(
         data
       );
       return response.data.user;
-    } catch (error: any) {
-      return rejectWithValue(error.message || "Failed to update profile");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to update profile";
+      return rejectWithValue(errorMessage);
     }
   }
 );

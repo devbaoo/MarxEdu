@@ -1,4 +1,4 @@
-export const BASE_URL = "https://quizlingo-mb7fv.ondigitalocean.app/api";
+export const BASE_URL = "https://marxedu-cu27m.ondigitalocean.app/api";
 // export const BASE_URL = "http://localhost:8080/api";
 //auth
 export const LOGIN_ENDPOINT = `${BASE_URL}/auth/login`;
@@ -86,22 +86,22 @@ export const MARK_ALL_NOTIFICATIONS_READ_ENDPOINT = `${BASE_URL}/notifications/m
 //leaderboard
 export const GET_LEADERBOARD_ENDPOINT = `${BASE_URL}/leaderboard`;
 
-//marxist economics
-export const GENERATE_MARXIST_LESSON_ENDPOINT = `${BASE_URL}/marxist-economics/generate-lesson`;
-export const GET_MARXIST_LEARNING_PATH_ENDPOINT = `${BASE_URL}/marxist-economics/learning-path`;
-export const GET_MARXIST_LESSON_BY_PATH_ENDPOINT = (pathId: string) => `${BASE_URL}/marxist-economics/lessons/${pathId}`;
-export const COMPLETE_MARXIST_LESSON_ENDPOINT = `${BASE_URL}/marxist-economics/complete-lesson`;
-export const RETRY_MARXIST_LESSON_ENDPOINT = `${BASE_URL}/marxist-economics/retry-lesson`;
-export const GET_MARXIST_STATS_ENDPOINT = `${BASE_URL}/marxist-economics/stats`;
-export const GET_MARXIST_TOPICS_ENDPOINT = `${BASE_URL}/marxist-economics/topics`;
-export const ANALYZE_MARXIST_PROGRESS_ENDPOINT = `${BASE_URL}/marxist-economics/analyze-progress`;
-export const TEST_MARXIST_CONNECTION_ENDPOINT = `${BASE_URL}/marxist-economics/test-connection`;
-export const TEST_GEMINI_ENDPOINT = `${BASE_URL}/marxist-economics/test-gemini`;
+//marxist philosophy learning system
+export const GENERATE_MARXIST_PHILOSOPHY_LESSON_ENDPOINT = `${BASE_URL}/marxist-philosophy/generate-lesson`;
+export const GET_MARXIST_PHILOSOPHY_LEARNING_PATH_ENDPOINT = `${BASE_URL}/marxist-philosophy/learning-path`;
+export const GET_MARXIST_PHILOSOPHY_LESSON_BY_PATH_ENDPOINT = (pathId: string) => `${BASE_URL}/marxist-philosophy/lessons/${pathId}`;
+export const COMPLETE_MARXIST_PHILOSOPHY_LESSON_ENDPOINT = `${BASE_URL}/marxist-philosophy/complete-lesson`;
+export const RETRY_MARXIST_PHILOSOPHY_LESSON_ENDPOINT = `${BASE_URL}/marxist-philosophy/retry-lesson`;
+export const GET_MARXIST_PHILOSOPHY_STATS_ENDPOINT = `${BASE_URL}/marxist-philosophy/stats`;
+export const GET_MARXIST_PHILOSOPHY_TOPICS_ENDPOINT = `${BASE_URL}/marxist-philosophy/topics`;
+export const ANALYZE_MARXIST_PHILOSOPHY_PROGRESS_ENDPOINT = `${BASE_URL}/marxist-philosophy/analyze-progress`;
+export const TEST_MARXIST_PHILOSOPHY_CONNECTION_ENDPOINT = `${BASE_URL}/marxist-philosophy/test-connection`;
+export const TEST_MARXIST_PHILOSOPHY_GEMINI_ENDPOINT = `${BASE_URL}/marxist-philosophy/test-gemini`;
 
-//marxist topics management
-export const CREATE_MARXIST_TOPIC_ENDPOINT = `${BASE_URL}/marxist-topics`;
-export const GET_MARXIST_TOPICS_LIST_ENDPOINT = `${BASE_URL}/marxist-topics`;
-export const GET_MARXIST_TOPIC_BY_ID_ENDPOINT = (id: string) => `${BASE_URL}/marxist-topics/${id}`;
-export const UPDATE_MARXIST_TOPIC_ENDPOINT = (id: string) => `${BASE_URL}/marxist-topics/${id}`;
-export const DELETE_MARXIST_TOPIC_ENDPOINT = (id: string) => `${BASE_URL}/marxist-topics/${id}`;
-export const SEED_MARXIST_TOPICS_ENDPOINT = `${BASE_URL}/marxist-topics/seed`;
+//marxist philosophy topics management - BACKEND USES MARXIST-TOPICS NOT MARXIST-PHILOSOPHY-TOPICS
+export const CREATE_MARXIST_PHILOSOPHY_TOPIC_ENDPOINT = `${BASE_URL}/marxist-topics`;
+export const GET_MARXIST_PHILOSOPHY_TOPICS_LIST_ENDPOINT = `${BASE_URL}/marxist-topics`;
+export const GET_MARXIST_PHILOSOPHY_TOPIC_BY_ID_ENDPOINT = (id: string) => `${BASE_URL}/marxist-topics/${id}`;
+export const UPDATE_MARXIST_PHILOSOPHY_TOPIC_ENDPOINT = (id: string) => `${BASE_URL}/marxist-topics/${id}`;
+export const DELETE_MARXIST_PHILOSOPHY_TOPIC_ENDPOINT = (id: string) => `${BASE_URL}/marxist-topics/${id}`;
+export const SEED_MARXIST_PHILOSOPHY_TOPICS_ENDPOINT = `${BASE_URL}/marxist-topics/seed`;

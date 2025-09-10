@@ -22,23 +22,23 @@ const LessonPage: React.FC = () => {
         <div className="text-center">
           <Alert
             message="🚩 Chuyển hướng đến MarxEdu"
-            description="Bài học tiếng Anh đã được thay thế bằng hệ thống bài học Kinh tế chính trị Mác-Lê-Nin."
+            description="Bài học tiếng Anh đã được thay thế bằng hệ thống bài học Triết học Mác-Lê-Nin."
             type="info"
             showIcon
             className="mb-6"
           />
-          
+
           <Title level={2} className="text-red-700 mb-4">
             MarxEdu - Bài học Marxist
           </Title>
-          
+
           <div className="mb-6">
             <Spin size="large" />
             <Text type="secondary" className="block mt-4">
               Đang chuyển hướng trong 2 giây...
             </Text>
           </div>
-          
+
           <Button
             type="primary"
             size="large"
