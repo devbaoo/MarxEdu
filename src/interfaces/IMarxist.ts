@@ -1,5 +1,5 @@
-// Marxist Topic Interfaces
-export interface IMarxistTopic {
+// Marxist Philosophy Topic Interfaces
+export interface IMarxistPhilosophyTopic {
   _id: string;
   name: string;
   title: string;
@@ -16,7 +16,7 @@ export interface IMarxistTopic {
   updatedAt: string;
 }
 
-export interface ICreateMarxistTopicData {
+export interface ICreateMarxistPhilosophyTopicData {
   name: string;
   title: string;
   description: string;
@@ -26,7 +26,7 @@ export interface ICreateMarxistTopicData {
   displayOrder?: number;
 }
 
-export interface IUpdateMarxistTopicData {
+export interface IUpdateMarxistPhilosophyTopicData {
   title?: string;
   description?: string;
   keywords?: string[];
@@ -36,10 +36,10 @@ export interface IUpdateMarxistTopicData {
   isActive?: boolean;
 }
 
-export interface IMarxistTopicsResponse {
+export interface IMarxistPhilosophyTopicsResponse {
   success: boolean;
   message: string;
-  topics: IMarxistTopic[];
+  topics: IMarxistPhilosophyTopic[];
   pagination: {
     currentPage: number;
     totalPages: number;
@@ -48,12 +48,33 @@ export interface IMarxistTopicsResponse {
   };
 }
 
-// Marxist Learning Path Interfaces
+// Marxist Philosophy Learning Path Interfaces
 export interface IMarxistLearningPath {
   pathId: string;
   lessonId: string;
   title: string;
-  marxistTopic: {
+  marxistPhilosophyTopic: {
+    id: string;
+    name: string;
+    title: string;
+    description: string;
+  };
+  difficultyLevel: number;
+  recommendedReason: string;
+  previousScore: number;
+  order: number;
+  completed: boolean;
+  achievedScore?: number;
+  completedAt?: string;
+  status: "LOCKED" | "ACTIVE" | "COMPLETE";
+  createdAt: string;
+}
+
+export interface IMarxistPhilosophyLearningPath {
+  pathId: string;
+  lessonId: string;
+  title: string;
+  marxistPhilosophyTopic: {
     id: string;
     name: string;
     title: string;
@@ -71,7 +92,7 @@ export interface IMarxistLearningPath {
 }
 
 // Learning path response interface
-export interface IMarxistLearningPathResponse {
+export interface IMarxistPhilosophyLearningPathResponse {
     success: boolean;
     statusCode: number;
     message: string;
@@ -87,13 +108,13 @@ export interface IMarxistLearningPathResponse {
     availableTopics?: number;
 }
 
-// Marxist Lesson Generation Interfaces
-export interface IGenerateMarxistLessonOptions {
+// Marxist Philosophy Lesson Generation Interfaces
+export interface IGenerateMarxistPhilosophyLessonOptions {
   topic?: string;
   difficulty?: number;
 }
 
-export interface IGenerateMarxistLessonResponse {
+export interface IGenerateMarxistPhilosophyLessonResponse {
   success: boolean;
   statusCode: number;
   message: string;
@@ -118,8 +139,8 @@ export interface IGenerateMarxistLessonResponse {
   };
 }
 
-// Marxist Statistics Interfaces
-export interface IMarxistTopicStats {
+// Marxist Philosophy Statistics Interfaces
+export interface IMarxistPhilosophyTopicStats {
   topicId: string;
   name: string;
   title: string;
@@ -128,37 +149,37 @@ export interface IMarxistTopicStats {
   avgScore: number;
 }
 
-export interface IMarxistStats {
+export interface IMarxistPhilosophyStats {
   totalLessons: number;
   completedLessons: number;
   completionRate: number;
   overallAvgScore: number;
-  topicBreakdown: IMarxistTopicStats[];
+  topicBreakdown: IMarxistPhilosophyTopicStats[];
 }
 
-export interface IMarxistStatsResponse {
+export interface IMarxistPhilosophyStatsResponse {
   success: boolean;
   statusCode: number;
   message: string;
-  stats: IMarxistStats;
+  stats: IMarxistPhilosophyStats;
 }
 
 // Progress Analysis Interfaces
-export interface IMarxistProgressAnalysis {
+export interface IMarxistPhilosophyProgressAnalysis {
   recommendedTopic: string;
   difficultyLevel: number;
   previousScore?: number;
   reason: string;
 }
 
-export interface IMarxistProgressAnalysisResponse {
+export interface IMarxistPhilosophyProgressAnalysisResponse {
   success: boolean;
   message: string;
-  analysis: IMarxistProgressAnalysis;
+  analysis: IMarxistPhilosophyProgressAnalysis;
 }
 
 // Complete Lesson Interfaces
-export interface ICompleteMarxistLessonData {
+export interface ICompleteMarxistPhilosophyLessonData {
     lessonId: string;
     score: number;
     questionResults?: Array<{
@@ -173,7 +194,7 @@ export interface ICompleteMarxistLessonData {
 }
 
 // Complete lesson response interface
-export interface ICompleteMarxistLessonResponse {
+export interface ICompleteMarxistPhilosophyLessonResponse {
     success: boolean;
     statusCode: number;
     message: string;
@@ -198,7 +219,81 @@ export interface ICompleteMarxistLessonResponse {
     progressStatus: 'COMPLETE' | 'FAILED';
 }
 
-// Gemini Connection Test Interface
+// Multi-AI Connection Test Interfaces
+export interface IAIProviderStatus {
+  success: boolean;
+  connected: boolean;
+  message: string;
+  model?: string;
+  response?: string;
+  usage?: {
+    prompt_tokens?: number;
+    completion_tokens?: number;
+    total_tokens?: number;
+  };
+  config?: {
+    model: string;
+    baseUrl: string;
+    apiKeyStatus: string;
+    source: string;
+  };
+}
+
+export interface IMultiAIConnectionResponse {
+  success: boolean;
+  message: string;
+  results: {
+    gemini: IAIProviderStatus;
+    deepseek: IAIProviderStatus;
+  };
+  summary: {
+    total: number;
+    connected: number;
+    failed: number;
+  };
+}
+
+// Load Balancer Info Interface
+export interface ILoadBalancerInfo {
+  strategy: string;
+  providerAttempt: number;
+  totalProviders: number;
+  currentLoads?: Record<string, number>;
+  attemptedProviders?: string[];
+  totalAttempts?: number;
+  failureCounts?: Record<string, number>;
+}
+
+// Enhanced Generation Response with Load Balancer Info
+export interface IGenerateMarxistPhilosophyLessonResponse {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  lesson?: {
+    lessonId: string;
+    title: string;
+    topic: string;
+    difficultyLevel: number;
+    questionCount: number;
+    maxScore: number;
+    createdAt: string;
+  };
+  learningPath?: {
+    pathId: string;
+    order: number;
+    marxistTopic: {
+      id: string;
+      name: string;
+      title: string;
+    };
+    recommendedReason: string;
+  };
+  // Multi-AI specific fields
+  provider?: string; // 'gemini' | 'deepseek'
+  loadBalancer?: ILoadBalancerInfo;
+}
+
+// Legacy Gemini Connection Response (for backward compatibility)
 export interface IGeminiConnectionResponse {
   success: boolean;
   message: string;

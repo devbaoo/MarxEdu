@@ -12,11 +12,12 @@ const TopicForm: React.FC = () => {
       <Card className="w-full max-w-2xl shadow-xl">
         <div className="text-center">
           <Title level={2} className="text-red-700 mb-4">
-            🚩 MarxEdu - Kinh tế chính trị Mác-Lê-Nin
+            🚩 MarxEdu - Triết học Mác-Lê-Nin
           </Title>
           <Text type="secondary" className="block mb-6">
-            Ứng dụng này hiện tại chỉ tập trung vào việc học kinh tế chính trị Mác-Lê-Nin.
-            Các tùy chọn chủ đề trước đây đã được thay thế bằng hệ thống AI tự động.
+            Ứng dụng này hiện tại chỉ tập trung vào việc học triết học
+            Mác-Lê-Nin. Các tùy chọn chủ đề trước đây đã được thay thế bằng hệ
+            thống AI tự động.
           </Text>
           <Button
             type="primary"
@@ -24,7 +25,7 @@ const TopicForm: React.FC = () => {
             onClick={() => navigate("/marxist-economics")}
             className="bg-red-600 hover:bg-red-700"
           >
-            Bắt đầu học Kinh tế chính trị Mác-Lê-Nin
+            Bắt đầu học Triết học Mác-Lê-Nin
           </Button>
         </div>
       </Card>

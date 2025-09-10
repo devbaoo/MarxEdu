@@ -13,7 +13,8 @@ const Footer = () => {
               <span className="text-red-600 font-bold font-baloo">
                 phương pháp giảng dạy dựa trên nguyên lý khoa học
               </span>
-              ! Các bài học chuyên sâu sẽ giúp bạn hiểu rõ kinh tế chính trị Mác-Lênin, nắm vững lý thuyết và ứng dụng thực tiễn.
+              ! Các bài học chuyên sâu sẽ giúp bạn hiểu rõ triết học Mác-Lênin,
+              nắm vững lý thuyết và ứng dụng thực tiễn.
             </p>
           </div>
 
@@ -45,7 +46,9 @@ const Footer = () => {
               Dựa trên căn cứ <br className="hidden sm:block" /> khoa học
             </h2>
             <p className="mt-3 sm:mt-4 text-sm sm:text-base md:text-lg text-gray-700 max-w-xl leading-relaxed font-baloo">
-              Chúng tôi kết hợp các phương pháp giảng dạy khoa học với nội dung chuyên sâu để tạo nên những khóa học hữu ích giúp bạn nắm vững lý thuyết kinh tế chính trị Mác-Lênin!
+              Chúng tôi kết hợp các phương pháp giảng dạy khoa học với nội dung
+              chuyên sâu để tạo nên những khóa học hữu ích giúp bạn nắm vững lý
+              thuyết triết học Mác-Lênin!
             </p>
           </div>
         </div>
@@ -59,7 +62,9 @@ const Footer = () => {
               tiếp thêm động lực
             </h2>
             <p className="text-sm sm:text-base md:text-[1.15rem] leading-normal md:leading-[1.75rem] font-medium text-gray-700 mt-3 sm:mt-4 max-w-xl font-baloo mx-auto md:mx-0">
-              Ứng dụng giúp người học dễ dàng xây dựng thói quen học tập về kinh tế chính trị, qua những tính năng tương tác thú vị, các thử thách học thuật, và hệ thống theo dõi tiến độ khoa học.
+              Ứng dụng giúp người học dễ dàng xây dựng thói quen học tập về
+              triết học, qua những tính năng tương tác thú vị, các thử thách học
+              thuật, và hệ thống theo dõi tiến độ khoa học.
             </p>
           </div>
 
@@ -90,7 +95,9 @@ const Footer = () => {
             phương pháp học <br className="hidden sm:block" /> khoa học
           </h2>
           <p className="text-gray-700 text-sm sm:text-base md:text-[1.25rem] leading-normal md:leading-[1.75rem] font-medium mt-3 sm:mt-4 font-baloo max-w-xl mx-auto md:mx-0">
-            Kết hợp phương pháp giảng dạy truyền thống và công nghệ hiện đại, các bài học được thiết kế khoa học để giúp bạn nắm vững kiến thức kinh tế chính trị Mác-Lênin một cách sâu sắc và toàn diện.
+            Kết hợp phương pháp giảng dạy truyền thống và công nghệ hiện đại,
+            các bài học được thiết kế khoa học để giúp bạn nắm vững kiến thức
+            triết học Mác-Lênin một cách sâu sắc và toàn diện.
           </p>
         </div>
       </section>
