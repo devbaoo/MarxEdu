@@ -20,14 +20,18 @@ export const CHOOSE_SKILLS_ENDPOINT = `${BASE_URL}/user/skill`;
 
 //legacy lesson endpoints (deprecated - use Marxist Economics instead)
 export const GET_LESSONS_ENDPOINT = `${BASE_URL}/lessons`; // DEPRECATED
-export const GET_USER_LEARNING_PATH_ENDPOINT = `${BASE_URL}/user-lessons-learning-path`; // DEPRECATED  
-export const GET_LESSON_BY_ID_ENDPOINT = (id: string) => `${BASE_URL}/lessons/${id}`; // DEPRECATED
+export const GET_USER_LEARNING_PATH_ENDPOINT = `${BASE_URL}/user-lessons-learning-path`; // DEPRECATED
+export const GET_LESSON_BY_ID_ENDPOINT = (id: string) =>
+  `${BASE_URL}/lessons/${id}`; // DEPRECATED
 export const COMPLETE_LESSON_ENDPOINT = `${BASE_URL}/progress`; // DEPRECATED
 export const RETRY_LESSON_ENDPOINT = `${BASE_URL}/lessons/retry`; // DEPRECATED
-export const GET_CHECK_COMPLETED_LESSON_ENDPOINT = (id: string) => `${BASE_URL}/check-completion/${id}`; // DEPRECATED
+export const GET_CHECK_COMPLETED_LESSON_ENDPOINT = (id: string) =>
+  `${BASE_URL}/check-completion/${id}`; // DEPRECATED
 export const CREATE_LESSON_ENDPOINT = `${BASE_URL}/lessons`; // DEPRECATED
-export const UPDATE_LESSON_ENDPOINT = (id: string) => `${BASE_URL}/lessons/${id}`; // DEPRECATED
-export const DELETE_LESSON_ENDPOINT = (id: string) => `${BASE_URL}/lessons/${id}`; // DEPRECATED
+export const UPDATE_LESSON_ENDPOINT = (id: string) =>
+  `${BASE_URL}/lessons/${id}`; // DEPRECATED
+export const DELETE_LESSON_ENDPOINT = (id: string) =>
+  `${BASE_URL}/lessons/${id}`; // DEPRECATED
 
 //admin
 export const GET_USERS_ENDPOINT = `${BASE_URL}/users`;
@@ -89,7 +93,9 @@ export const GET_LEADERBOARD_ENDPOINT = `${BASE_URL}/leaderboard`;
 //marxist philosophy learning system
 export const GENERATE_MARXIST_PHILOSOPHY_LESSON_ENDPOINT = `${BASE_URL}/marxist-philosophy/generate-lesson`;
 export const GET_MARXIST_PHILOSOPHY_LEARNING_PATH_ENDPOINT = `${BASE_URL}/marxist-philosophy/learning-path`;
-export const GET_MARXIST_PHILOSOPHY_LESSON_BY_PATH_ENDPOINT = (pathId: string) => `${BASE_URL}/marxist-philosophy/lessons/${pathId}`;
+export const GET_MARXIST_PHILOSOPHY_LESSON_BY_PATH_ENDPOINT = (
+  pathId: string
+) => `${BASE_URL}/marxist-philosophy/lessons/${pathId}`;
 export const COMPLETE_MARXIST_PHILOSOPHY_LESSON_ENDPOINT = `${BASE_URL}/marxist-philosophy/complete-lesson`;
 export const RETRY_MARXIST_PHILOSOPHY_LESSON_ENDPOINT = `${BASE_URL}/marxist-philosophy/retry-lesson`;
 export const GET_MARXIST_PHILOSOPHY_STATS_ENDPOINT = `${BASE_URL}/marxist-philosophy/stats`;
@@ -101,7 +107,23 @@ export const TEST_MARXIST_PHILOSOPHY_GEMINI_ENDPOINT = `${BASE_URL}/marxist-phil
 //marxist philosophy topics management - BACKEND USES MARXIST-TOPICS NOT MARXIST-PHILOSOPHY-TOPICS
 export const CREATE_MARXIST_PHILOSOPHY_TOPIC_ENDPOINT = `${BASE_URL}/marxist-topics`;
 export const GET_MARXIST_PHILOSOPHY_TOPICS_LIST_ENDPOINT = `${BASE_URL}/marxist-topics`;
-export const GET_MARXIST_PHILOSOPHY_TOPIC_BY_ID_ENDPOINT = (id: string) => `${BASE_URL}/marxist-topics/${id}`;
-export const UPDATE_MARXIST_PHILOSOPHY_TOPIC_ENDPOINT = (id: string) => `${BASE_URL}/marxist-topics/${id}`;
-export const DELETE_MARXIST_PHILOSOPHY_TOPIC_ENDPOINT = (id: string) => `${BASE_URL}/marxist-topics/${id}`;
+export const GET_MARXIST_PHILOSOPHY_TOPIC_BY_ID_ENDPOINT = (id: string) =>
+  `${BASE_URL}/marxist-topics/${id}`;
+export const UPDATE_MARXIST_PHILOSOPHY_TOPIC_ENDPOINT = (id: string) =>
+  `${BASE_URL}/marxist-topics/${id}`;
+export const DELETE_MARXIST_PHILOSOPHY_TOPIC_ENDPOINT = (id: string) =>
+  `${BASE_URL}/marxist-topics/${id}`;
 export const SEED_MARXIST_PHILOSOPHY_TOPICS_ENDPOINT = `${BASE_URL}/marxist-topics/seed`;
+
+//check-in
+export const CHECK_IN_ENDPOINT = `${BASE_URL}/check-in`;
+export const CHECK_IN_STATUS_ENDPOINT = `${BASE_URL}/check-in/status`;
+
+//survey
+export const GET_SURVEY_ENDPOINT = `${BASE_URL}/survey`;
+export const GET_SURVEY_STATUS_ENDPOINT = `${BASE_URL}/survey/status`;
+export const SUBMIT_SURVEY_ENDPOINT = `${BASE_URL}/survey/submit`;
+
+//admin survey
+export const ADMIN_CREATE_SURVEY_ENDPOINT = `${BASE_URL}/admin/survey`;
+export const ADMIN_GET_SURVEY_STATISTICS_ENDPOINT = `${BASE_URL}/admin/survey/statistics`;
