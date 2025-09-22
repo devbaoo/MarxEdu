@@ -60,8 +60,8 @@ const MultiAITestPage: React.FC = () => {
     switch (provider) {
       case "gemini":
         return <RobotOutlined style={{ color: "#4285f4" }} />;
-      case "deepseek":
-        return <ThunderboltOutlined style={{ color: "#ff6b35" }} />;
+      case "grok":
+        return <ThunderboltOutlined style={{ color: "#00d4aa" }} />;
       default:
         return <ExperimentOutlined />;
     }
@@ -134,8 +134,8 @@ const MultiAITestPage: React.FC = () => {
           Test Multi-AI System
         </Title>
         <Paragraph className="text-gray-600">
-          Kiểm tra kết nối và chức năng của hệ thống Multi-AI (Gemini +
-          DeepSeek) để tạo câu hỏi triết học Mác-Lê-Nin
+          Kiểm tra kết nối và chức năng của hệ thống Multi-AI (Gemini + Grok4)
+          để tạo câu hỏi triết học Mác-Lê-Nin
         </Paragraph>
 
         {/* Quick Status Overview */}
@@ -153,9 +153,9 @@ const MultiAITestPage: React.FC = () => {
                   }`}
                 />
                 <Badge
-                  status={multiAI.providers.deepseek ? "success" : "error"}
-                  text={`DeepSeek: ${
-                    multiAI.providers.deepseek ? "Hoạt động" : "Lỗi"
+                  status={multiAI.providers.grok ? "success" : "error"}
+                  text={`Grok4: ${
+                    multiAI.providers.grok ? "Hoạt động" : "Lỗi"
                   }`}
                 />
               </div>
@@ -281,49 +281,49 @@ const MultiAITestPage: React.FC = () => {
               <Card
                 title={
                   <div className="flex items-center gap-2">
-                    {getProviderIcon("deepseek")}
-                    <span>DeepSeek V3.1</span>
+                    {getProviderIcon("grok")}
+                    <span>Grok4 (OpenRouter)</span>
                   </div>
                 }
                 className="h-full"
               >
                 <div className="text-center py-4">
                   <div className="text-4xl mb-3">
-                    {getProviderStatus(testResult.results.deepseek).icon}
+                    {getProviderStatus(testResult.results.grok).icon}
                   </div>
                   <Title level={5}>
-                    {getProviderStatus(testResult.results.deepseek).text}
+                    {getProviderStatus(testResult.results.grok).text}
                   </Title>
 
-                  {testResult.results.deepseek.config && (
+                  {testResult.results.grok.config && (
                     <div className="mt-4 text-left">
                       <Divider />
                       <div className="space-y-2 text-sm">
                         <div>
                           <strong>Model:</strong>{" "}
-                          {testResult.results.deepseek.config.model}
+                          {testResult.results.grok.config.model}
                         </div>
                         <div>
                           <strong>API Key:</strong>
                           <Tag
                             color={
-                              testResult.results.deepseek.config
-                                .apiKeyStatus === "Present"
+                              testResult.results.grok.config.apiKeyStatus ===
+                              "Present"
                                 ? "green"
                                 : "red"
                             }
                           >
-                            {testResult.results.deepseek.config.apiKeyStatus}
+                            {testResult.results.grok.config.apiKeyStatus}
                           </Tag>
                         </div>
                         <div>
                           <strong>Source:</strong>{" "}
-                          {testResult.results.deepseek.config.source}
+                          {testResult.results.grok.config.source}
                         </div>
-                        {testResult.results.deepseek.usage && (
+                        {testResult.results.grok.usage && (
                           <div>
                             <strong>Tokens:</strong>{" "}
-                            {testResult.results.deepseek.usage.total_tokens ||
+                            {testResult.results.grok.usage.total_tokens ||
                               "N/A"}
                           </div>
                         )}
@@ -343,8 +343,8 @@ const MultiAITestPage: React.FC = () => {
           <Col xs={24} md={12}>
             <Title level={5}>🤖 Multi-AI Load Balancer</Title>
             <Paragraph>
-              Hệ thống sử dụng Load Balancer để phân bổ tải giữa Gemini và
-              DeepSeek, đảm bảo tính ổn định và hiệu suất cao.
+              Hệ thống sử dụng Load Balancer để phân bổ tải giữa Gemini và Grok4
+              (OpenRouter), đảm bảo tính ổn định và hiệu suất cao.
             </Paragraph>
 
             <Title level={5}>🔍 Kiểm tra kết nối</Title>
@@ -368,11 +368,13 @@ const MultiAITestPage: React.FC = () => {
               </li>
             </ul>
 
-            <Title level={5}>📊 Monitoring</Title>
+            <Title level={5}>📊 Monitoring & Quality</Title>
             <ul>
               <li>Circuit breaker khi quá 3 lỗi liên tiếp</li>
               <li>Rate limiting và queue management</li>
               <li>Automatic failover giữa providers</li>
+              <li>Advanced JSON repair cho Grok4</li>
+              <li>Real-time response cleaning</li>
             </ul>
           </Col>
         </Row>

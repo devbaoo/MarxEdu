@@ -27,18 +27,18 @@ const LessonSubmitPage: React.FC = () => {
             showIcon
             className="mb-6"
           />
-          
+
           <Title level={2} className="text-red-700 mb-4">
             MarxEdu - Hoàn thành bài học
           </Title>
-          
+
           <div className="mb-6">
             <Spin size="large" />
             <Text type="secondary" className="block mt-4">
               Đang chuyển hướng trong 2 giây...
             </Text>
           </div>
-          
+
           <Button
             type="primary"
             size="large"
@@ -53,4 +53,4 @@ const LessonSubmitPage: React.FC = () => {
   );
 };
 
-export default LessonSubmitPage; 
+export default LessonSubmitPage;

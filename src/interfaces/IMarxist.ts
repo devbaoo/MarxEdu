@@ -244,7 +244,7 @@ export interface IMultiAIConnectionResponse {
   message: string;
   results: {
     gemini: IAIProviderStatus;
-    deepseek: IAIProviderStatus;
+    grok: IAIProviderStatus;
   };
   summary: {
     total: number;
@@ -289,7 +289,7 @@ export interface IGenerateMarxistPhilosophyLessonResponse {
     recommendedReason: string;
   };
   // Multi-AI specific fields
-  provider?: string; // 'gemini' | 'deepseek'
+  provider?: string; // 'gemini' | 'grok'
   loadBalancer?: ILoadBalancerInfo;
 }
 
