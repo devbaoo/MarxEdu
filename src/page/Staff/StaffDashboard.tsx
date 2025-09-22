@@ -148,7 +148,7 @@ const StaffDashboard = () => {
               Test Multi-AI System
             </Title>
             <Text type="secondary" className="block mb-4">
-              Kiểm tra Gemini + DeepSeek Load Balancer
+              Kiểm tra Gemini + Grok4 Load Balancer
             </Text>
             <Button
               type="primary"
@@ -168,8 +168,8 @@ const StaffDashboard = () => {
         </Title>
         <Paragraph className="text-white text-lg mb-0">
           Bạn đang quản lý hệ thống học tập Triết học Mác-Lê-Nin với Multi-AI
-          System (Gemini + DeepSeek). Sử dụng các công cụ trên để hỗ trợ học
-          viên và phát triển nội dung học tập chất lượng cao.
+          System (Gemini + Grok4). Sử dụng các công cụ trên để hỗ trợ học viên
+          và phát triển nội dung học tập chất lượng cao.
         </Paragraph>
       </Card>
     </div>

@@ -376,7 +376,7 @@ const PhilosophyLessonTestPage: React.FC = () => {
 
               // Show loading message for background generation
               message.loading(
-                "Đang tự động tạo bài học tiếp theo với Multi-AI...",
+                "Đang tự động tạo bài học tiếp theo với Multi-AI... Đang xử lý JSON...",
                 0
               );
 

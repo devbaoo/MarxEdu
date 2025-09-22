@@ -1,5 +1,5 @@
-export const BASE_URL = "https://clownfish-app-u7jdf.ondigitalocean.app/api";
-// export const BASE_URL = "http://localhost:8080/api";
+// export const BASE_URL = "https://clownfish-app-u7jdf.ondigitalocean.app/api";
+export const BASE_URL = "http://localhost:8080/api";
 //auth
 export const LOGIN_ENDPOINT = `${BASE_URL}/auth/login`;
 export const REGISTER_ENDPOINT = `${BASE_URL}/auth/register`;

@@ -75,9 +75,9 @@ const PhilosophyDashboard: React.FC = () => {
         canGenerate: !hasIncompleteLesson,
       });
 
-      // Show loading message for queue system
+      // Show loading message for Multi-AI system with JSON processing
       message.loading(
-        "Đang tạo bài học với AI... Vui lòng chờ trong giây lát.",
+        "Đang tạo bài học với Multi-AI System (Gemini + Grok4)... Đang xử lý và kiểm tra JSON...",
         0
       );
 
@@ -173,6 +173,19 @@ const PhilosophyDashboard: React.FC = () => {
         // Timeout
         message.error({
           content: `⏱️ ${error.message}`,
+          duration: 5,
+        });
+      } else if (error?.message?.includes("JSON")) {
+        // JSON parsing errors from Grok4
+        message.error({
+          content:
+            "Lỗi xử lý dữ liệu từ AI. Hệ thống đang tự động sửa chữa và thử lại...",
+          duration: 6,
+        });
+      } else if (error?.message?.includes("repair")) {
+        // JSON repair errors
+        message.warning({
+          content: "AI đang tối ưu hóa dữ liệu. Vui lòng thử lại sau giây lát.",
           duration: 5,
         });
       } else {

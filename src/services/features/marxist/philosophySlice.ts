@@ -49,7 +49,7 @@ interface PhilosophyState {
     connected: boolean;
     providers: {
       gemini: boolean;
-      deepseek: boolean;
+      grok: boolean;
     };
     lastTest?: string;
     loadBalancerStats?: {
@@ -81,7 +81,7 @@ const initialState: PhilosophyState = {
     connected: false,
     providers: {
       gemini: false,
-      deepseek: false,
+      grok: false,
     },
     lastTest: undefined,
     loadBalancerStats: undefined,
@@ -396,7 +396,7 @@ const philosophySlice = createSlice({
         state.loading = false;
         state.multiAI.connected = action.payload.success;
         state.multiAI.providers.gemini = action.payload.results?.gemini?.connected || false;
-        state.multiAI.providers.deepseek = action.payload.results?.deepseek?.connected || false;
+        state.multiAI.providers.grok = action.payload.results?.grok?.connected || false;
         state.multiAI.lastTest = new Date().toISOString();
         state.success = action.payload.message;
         
@@ -408,7 +408,7 @@ const philosophySlice = createSlice({
         state.error = action.error.message || 'Multi-AI connection test failed';
         state.multiAI.connected = false;
         state.multiAI.providers.gemini = false;
-        state.multiAI.providers.deepseek = false;
+        state.multiAI.providers.grok = false;
       })
 
       // Test connection (Legacy)
