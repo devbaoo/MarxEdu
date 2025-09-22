@@ -48,6 +48,7 @@ import PhilosophyLessonsPage from "@/page/Staff/PhilosophyLessonsPage";
 import PhilosophyStatsPage from "@/page/Staff/PhilosophyStatsPage";
 import MultiAITestPage from "@/page/Staff/MultiAITestPage";
 import PhilosophyLessonDetailPage from "@/page/Philosophy/PhilosophyLessonDetailPage";
+import SurveyManagementPage from "@/page/Admin/SurveyManagementPage";
 import PhilosophyLessonTestPage from "@/page/Philosophy/PhilosophyLessonTestPage";
 
 const AppRouter = () => {
@@ -179,6 +180,7 @@ const AppRouter = () => {
           <Route path="packages" element={<AdminPackage />} />
           <Route path="users" element={<ManageUserPage />} />
           <Route path="notifications/all" element={<NotificationsAllPage />} />
+          <Route path="survey" element={<SurveyManagementPage />} />
         </Route>
       </Route>
 

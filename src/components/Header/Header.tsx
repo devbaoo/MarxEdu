@@ -11,6 +11,7 @@ import ChangePasswordModal from "@/components/Modal/ChangePasswordModal";
 import { FaFire, FaHeart, FaCrown } from "react-icons/fa";
 import NotificationButton from "@/components/Notification/NotificationButton";
 import LevelUpModal from "@/components/Modal/LevelUpModal";
+import CheckInButton from "@/components/CheckIn/CheckInButton";
 
 function getStreakColor(streak: number) {
   if (streak >= 25) return "#b16cff";      // tím
@@ -141,7 +142,7 @@ const Header = () => {
           <Typography.Title level={2} style={{ margin: 0, color: "#dc2626" }} className="font-baloo">
             MarxEdu
           </Typography.Title>
-          
+
           {/* Lives Display - Show only for authenticated users */}
         </div>
 
@@ -184,6 +185,8 @@ const Header = () => {
                   <span className="font-baloo text-gray-600">Streak: {userProfile?.streak || 0}</span>
                 </div>
               </div>
+
+              <CheckInButton />
 
               <NotificationButton />
 

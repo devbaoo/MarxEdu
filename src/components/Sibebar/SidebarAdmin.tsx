@@ -8,6 +8,7 @@ import {
   MenuUnfoldOutlined,
   BellOutlined,
   GiftOutlined,
+  FormOutlined,
 } from '@ant-design/icons';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
@@ -47,7 +48,7 @@ const Sidebar = () => {
       key: "users",
       icon: <UserOutlined />,
       label: "Quản lý người dùng",
-      path: "/admin/manage-users",
+      path: "/admin/users",
     },
     {
       key: "packages",
@@ -59,7 +60,13 @@ const Sidebar = () => {
       key: "notifications",
       icon: <BellOutlined />,
       label: "Thông báo",
-      path: "/admin/notifications",
+      path: "/admin/notifications/all",
+    },
+    {
+      key: "survey",
+      icon: <FormOutlined />,
+      label: "Quản lý khảo sát",
+      path: "/admin/survey",
     },
   ];
 
