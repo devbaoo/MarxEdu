@@ -469,7 +469,7 @@ const PhilosophyLessonTestPage: React.FC = () => {
                 message.error("Lỗi khi tải dữ liệu mới");
                 navigate("/philosophy");
               }
-            }, 12000); // Chờ 12 giây để AI tạo xong ContentPack + review quiz
+            }, 20000); // Chờ 20 giây để AI tạo xong ContentPack + review quiz
           } else {
             // Nếu không pass, chỉ refresh và navigate bình thường
             try {
