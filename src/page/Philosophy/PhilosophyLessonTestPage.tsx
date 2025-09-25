@@ -30,14 +30,13 @@ import {
   getMarxistPhilosophyLessonByPath,
   completeMarxistPhilosophyLesson,
   retryMarxistPhilosophyLesson,
-  generateMarxistPhilosophyLesson,
   getMarxistPhilosophyLearningPath,
 } from "@/services/features/marxist/philosophySlice";
 import {
   updateUserLives,
   updateUserXPAndLevel,
 } from "@/services/features/auth/authSlice";
-import { ILesson } from "@/interfaces/ILesson";
+import { ILesson, IQuestion } from "@/interfaces/ILesson";
 import { shuffleQuestions, shuffleAllQuestionOptions } from "@/lib/utils";
 
 const { Title, Text } = Typography;
@@ -62,7 +61,7 @@ const PhilosophyLessonTestPage: React.FC = () => {
   const [lessonLoading, setLessonLoading] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<Answer[]>([]);
-  const [timeLeft, setTimeLeft] = useState(2700); // 45 minutes = 2700 seconds
+  const [timeLeft, setTimeLeft] = useState(0); // Will be calculated dynamically from lesson questions
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [testStarted, setTestStarted] = useState(false);
 
@@ -113,9 +112,41 @@ const PhilosophyLessonTestPage: React.FC = () => {
           };
 
           setLesson(shuffledLesson);
+
+          // 🕒 Calculate total time dynamically from questions
+          const totalTimeSeconds =
+            shuffledLesson.questions?.reduce(
+              (total: number, question: IQuestion) => {
+                return total + (question.timeLimit || 30); // Default 30s per question
+              },
+              0
+            ) || 300; // Fallback to 5 minutes if no questions
+
+          setTimeLeft(totalTimeSeconds);
+          console.log(
+            `⏰ Total test time: ${totalTimeSeconds}s (${Math.round(
+              totalTimeSeconds / 60
+            )}min) for ${shuffledLesson.questions?.length} questions`
+          );
           console.log("✅ Lesson set with shuffled content");
         } else {
           setLesson(originalLesson);
+
+          // 🕒 Calculate total time dynamically from questions (even if not shuffled)
+          const totalTimeSeconds =
+            originalLesson.questions?.reduce(
+              (total: number, question: IQuestion) => {
+                return total + (question.timeLimit || 30); // Default 30s per question
+              },
+              0
+            ) || 300; // Fallback to 5 minutes if no questions
+
+          setTimeLeft(totalTimeSeconds);
+          console.log(
+            `⏰ Total test time: ${totalTimeSeconds}s (${Math.round(
+              totalTimeSeconds / 60
+            )}min) for ${originalLesson.questions?.length} questions`
+          );
           console.log("⚠️ No questions found to shuffle");
         }
       } else {
@@ -146,6 +177,17 @@ const PhilosophyLessonTestPage: React.FC = () => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  // 🕒 Calculate total time and format for display
+  const calculateTotalTime = (questions: IQuestion[]) => {
+    const totalSeconds =
+      questions?.reduce((total: number, question: IQuestion) => {
+        return total + (question.timeLimit || 30);
+      }, 0) || 300;
+
+    const minutes = Math.round(totalSeconds / 60);
+    return { totalSeconds, minutes, formatted: `${minutes} phút` };
   };
 
   const handleAnswerChange = (questionId: string, selectedAnswer: string) => {
@@ -367,78 +409,78 @@ const PhilosophyLessonTestPage: React.FC = () => {
           </div>
         ),
         onOk: async () => {
-          // 🚀 CLIENT-SIDE AUTO-GENERATION for passed tests
           if (result.passed) {
-            try {
-              console.log(
-                "🤖 Auto-generating next lesson after successful completion..."
-              );
+            // Hiển thị loading message khi AI đang tạo ContentPack + quiz
+            message.loading({
+              content:
+                "🤖 Multi-AI đang tạo: (1) Học liệu ôn tập + (2) Bài quiz 10 câu... Vui lòng chờ...",
+              duration: 0, // Không tự động tắt
+              key: "ai-generation-loading",
+            });
 
-              // Show loading message for background generation
-              message.loading(
-                "Đang tự động tạo bài học tiếp theo với Multi-AI... Đang xử lý JSON...",
-                0
-              );
+            console.log(
+              "✅ Lesson completed successfully. AI is generating ContentPack + quiz in background..."
+            );
 
-              const generateResult = await dispatch(
-                generateMarxistPhilosophyLesson({})
-              ).unwrap();
-              console.log("✅ Next lesson auto-generated:", generateResult);
-              message.destroy(); // Clear loading message
+            // Progressive loading messages để user biết AI đang làm gì
+            setTimeout(() => {
+              message.loading({
+                content:
+                  "🧠 Đang tạo học liệu ôn tập (tóm tắt, mindmap, flashcards)...",
+                duration: 0,
+                key: "ai-generation-loading",
+              });
+            }, 3000);
 
-              // Show AI provider info for auto-generated lesson
-              const aiProvider = generateResult.provider || "Multi-AI";
-              message.success(
-                `🎉 Bài học tiếp theo đã được tạo bởi ${aiProvider}!`
-              );
+            setTimeout(() => {
+              message.loading({
+                content:
+                  "📝 Đang tạo bài quiz 10 câu dựa trên học liệu vừa tạo...",
+                duration: 0,
+                key: "ai-generation-loading",
+              });
+            }, 7000);
 
-              // 🔄 FORCE REFRESH learning path after successful generation
-              console.log(
-                "🔄 Force refreshing learning path after AI generation..."
-              );
-              await dispatch(getMarxistPhilosophyLearningPath({})).unwrap();
-              console.log("✅ Learning path refreshed successfully");
-            } catch (genError) {
-              console.warn("⚠️ Failed to auto-generate next lesson:", genError);
-              message.destroy(); // Clear loading message
-
-              // Handle rate limiting errors gracefully
-              const error = genError as {
-                statusCode?: number;
-                message?: string;
-              };
-              if (error?.statusCode === 429) {
-                message.info(
-                  "Bạn có bài học khác đang được tạo. Vui lòng chờ hoàn tất."
-                );
-              } else if (error?.statusCode === 503) {
-                message.warning(
-                  "Hệ thống đang bận. Bài học tiếp theo sẽ được tạo sau."
-                );
-              }
-
-              // Still refresh learning path even if generation failed
+            // Chờ một chút để AI có thời gian tạo ContentPack + quiz
+            setTimeout(async () => {
               try {
+                // 🔄 Refresh learning path để lấy dữ liệu mới
                 await dispatch(getMarxistPhilosophyLearningPath({})).unwrap();
+                console.log("✅ Learning path refreshed successfully");
+
+                // Tắt loading message
+                message.destroy("ai-generation-loading");
+
+                // Hiển thị thông báo thành công
+                message.success({
+                  content:
+                    "🎉 Multi-AI đã hoàn thành: Học liệu ôn tập + Bài quiz 10 câu!",
+                  duration: 4,
+                });
+
+                // Navigate về dashboard
+                navigate("/philosophy");
               } catch (refreshError) {
                 console.warn(
                   "⚠️ Failed to refresh learning path:",
                   refreshError
                 );
+                message.destroy("ai-generation-loading");
+                message.error("Lỗi khi tải dữ liệu mới");
+                navigate("/philosophy");
               }
-            }
+            }, 12000); // Chờ 12 giây để AI tạo xong ContentPack + review quiz
           } else {
-            // 🔄 Always refresh learning path for failed attempts too
+            // Nếu không pass, chỉ refresh và navigate bình thường
             try {
               await dispatch(getMarxistPhilosophyLearningPath({})).unwrap();
               console.log("✅ Learning path refreshed after failed attempt");
             } catch (refreshError) {
               console.warn("⚠️ Failed to refresh learning path:", refreshError);
             }
-          }
 
-          // Navigate back to dashboard
-          navigate("/philosophy");
+            navigate("/philosophy");
+          }
         },
       });
 
@@ -630,8 +672,9 @@ const PhilosophyLessonTestPage: React.FC = () => {
               )}
               <strong>{lesson.title}</strong>
               <br />
-              {lesson.questions?.length || 10} câu hỏi • 45 phút • Điểm tối đa:{" "}
-              {lesson.maxScore || 100}
+              {lesson.questions?.length || 10} câu hỏi •{" "}
+              {calculateTotalTime(lesson.questions || []).formatted} • Điểm tối
+              đa: {lesson.maxScore || 100}
             </Text>
 
             <div className="bg-blue-50 p-4 rounded-lg mb-6 text-left">
@@ -640,7 +683,11 @@ const PhilosophyLessonTestPage: React.FC = () => {
               </Title>
               <ul className="space-y-1 text-blue-800">
                 <li>
-                  • Bạn có <strong>45 phút</strong> để hoàn thành bài kiểm tra
+                  • Bạn có{" "}
+                  <strong>
+                    {calculateTotalTime(lesson.questions || []).formatted}
+                  </strong>{" "}
+                  để hoàn thành bài kiểm tra (<strong>30 giây</strong> mỗi câu)
                 </li>
                 <li>
                   • Cần đạt <strong>ít nhất 70%</strong> để vượt qua
