@@ -1,6 +1,6 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
-import axiosInstance from '@/services/constant/axiosInstance';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
+import axiosInstance from "@/services/constant/axiosInstance";
 import {
   GENERATE_MARXIST_PHILOSOPHY_LESSON_ENDPOINT,
   GET_MARXIST_PHILOSOPHY_LEARNING_PATH_ENDPOINT,
@@ -12,13 +12,16 @@ import {
   ANALYZE_MARXIST_PHILOSOPHY_PROGRESS_ENDPOINT,
   TEST_MARXIST_PHILOSOPHY_CONNECTION_ENDPOINT,
   TEST_MARXIST_PHILOSOPHY_GEMINI_ENDPOINT,
+  GENERATE_CONTENT_PACK_ENDPOINT,
+  GET_LATEST_CONTENT_PACK_ENDPOINT,
+  GENERATE_LESSON_FROM_CONTENT_ENDPOINT,
   CREATE_MARXIST_PHILOSOPHY_TOPIC_ENDPOINT,
   GET_MARXIST_PHILOSOPHY_TOPICS_LIST_ENDPOINT,
   GET_MARXIST_PHILOSOPHY_TOPIC_BY_ID_ENDPOINT,
   UPDATE_MARXIST_PHILOSOPHY_TOPIC_ENDPOINT,
   DELETE_MARXIST_PHILOSOPHY_TOPIC_ENDPOINT,
-  SEED_MARXIST_PHILOSOPHY_TOPICS_ENDPOINT
-} from '@/services/constant/apiConfig';
+  SEED_MARXIST_PHILOSOPHY_TOPICS_ENDPOINT,
+} from "@/services/constant/apiConfig";
 import {
   IMarxistPhilosophyTopic,
   IMarxistPhilosophyLearningPath,
@@ -30,9 +33,13 @@ import {
   ICompleteMarxistPhilosophyLessonData,
   ICompleteMarxistPhilosophyLessonResponse,
   ICreateMarxistPhilosophyTopicData,
-  IUpdateMarxistPhilosophyTopicData
-} from '@/interfaces/IMarxist';
-import { ILesson } from '@/interfaces/ILesson';
+  IUpdateMarxistPhilosophyTopicData,
+  IGenerateContentPackPayload,
+  IGenerateContentPackResponse,
+  IGenerateLessonFromContentPayload,
+  IContentPack,
+} from "@/interfaces/IMarxist";
+import { ILesson } from "@/interfaces/ILesson";
 
 interface PhilosophyState {
   loading: boolean;
@@ -42,6 +49,8 @@ interface PhilosophyState {
   currentLesson: ILesson | null;
   stats: IMarxistPhilosophyStats | null;
   topics: IMarxistPhilosophyTopic[];
+  // Pre-study content
+  contentPack: IContentPack | null;
   progressAnalysis: unknown;
   geminiConnected: boolean;
   // Multi-AI status
@@ -75,6 +84,7 @@ const initialState: PhilosophyState = {
   currentLesson: null,
   stats: null,
   topics: [],
+  contentPack: null,
   progressAnalysis: null,
   geminiConnected: false,
   multiAI: {
@@ -91,9 +101,39 @@ const initialState: PhilosophyState = {
 // 🚀 Generate Marxist Philosophy Lesson
 export const generateMarxistPhilosophyLesson = createAsyncThunk(
   "philosophy/generateLesson",
-  async (options: IGenerateMarxistPhilosophyLessonOptions = {}) => {
-    const response = await axiosInstance.post(GENERATE_MARXIST_PHILOSOPHY_LESSON_ENDPOINT, options);
-    return response.data as IGenerateMarxistPhilosophyLessonResponse;
+  async (
+    options: IGenerateMarxistPhilosophyLessonOptions = {},
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await axiosInstance.post(
+        GENERATE_MARXIST_PHILOSOPHY_LESSON_ENDPOINT,
+        options
+      );
+      return response.data as IGenerateMarxistPhilosophyLessonResponse;
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        const errorData = error.response?.data;
+        if (errorData?.statusCode === 429) {
+          // Background generation in progress
+          return rejectWithValue({
+            statusCode: 429,
+            message:
+              errorData.message ||
+              "Hệ thống đang tạo bài học tự động, vui lòng chờ...",
+          });
+        }
+        return rejectWithValue({
+          statusCode: error.response?.status || 500,
+          message:
+            errorData?.message || error.message || "Failed to generate lesson",
+        });
+      }
+      return rejectWithValue({
+        statusCode: 500,
+        message: "Unknown error occurred",
+      });
+    }
   }
 );
 
@@ -101,7 +141,10 @@ export const generateMarxistPhilosophyLesson = createAsyncThunk(
 export const getMarxistPhilosophyLearningPath = createAsyncThunk(
   "philosophy/getLearningPath",
   async (params: { page?: number; limit?: number } = {}) => {
-    const response = await axiosInstance.get(GET_MARXIST_PHILOSOPHY_LEARNING_PATH_ENDPOINT, { params });
+    const response = await axiosInstance.get(
+      GET_MARXIST_PHILOSOPHY_LEARNING_PATH_ENDPOINT,
+      { params }
+    );
     return response.data as IMarxistPhilosophyLearningPathResponse;
   }
 );
@@ -110,38 +153,46 @@ export const getMarxistPhilosophyLearningPath = createAsyncThunk(
 export const getMarxistPhilosophyLessonByPath = createAsyncThunk(
   "philosophy/getLessonByPath",
   async (pathId: string) => {
-    const response = await axiosInstance.get(GET_MARXIST_PHILOSOPHY_LESSON_BY_PATH_ENDPOINT(pathId));
+    const response = await axiosInstance.get(
+      GET_MARXIST_PHILOSOPHY_LESSON_BY_PATH_ENDPOINT(pathId)
+    );
     return response.data;
   }
 );
 
 // ✅ Complete Marxist Philosophy Lesson
 export const completeMarxistPhilosophyLesson = createAsyncThunk(
-  'philosophy/completeLesson',
+  "philosophy/completeLesson",
   async (data: ICompleteMarxistPhilosophyLessonData, { rejectWithValue }) => {
     try {
-      console.log('🎯 Completing Marxist Philosophy lesson:', data);
-      
-      const response = await axiosInstance.post(COMPLETE_MARXIST_PHILOSOPHY_LESSON_ENDPOINT, data);
-      console.log('✅ Complete lesson response:', response.data);
-      
+      console.log("🎯 Completing Marxist Philosophy lesson:", data);
+
+      const response = await axiosInstance.post(
+        COMPLETE_MARXIST_PHILOSOPHY_LESSON_ENDPOINT,
+        data
+      );
+      console.log("✅ Complete lesson response:", response.data);
+
       return response.data as ICompleteMarxistPhilosophyLessonResponse;
     } catch (error: unknown) {
-      console.error('❌ Complete Marxist Philosophy lesson error:', error);
-      
+      console.error("❌ Complete Marxist Philosophy lesson error:", error);
+
       // Better error handling for different error types
       if (axios.isAxiosError(error)) {
-        const errorMessage = error.response?.data?.message || error.message || 'Network error occurred';
-        console.error('API Error Details:', {
+        const errorMessage =
+          error.response?.data?.message ||
+          error.message ||
+          "Network error occurred";
+        console.error("API Error Details:", {
           status: error.response?.status,
           data: error.response?.data,
-          url: error.config?.url
+          url: error.config?.url,
         });
         return rejectWithValue(errorMessage);
       } else if (error instanceof Error) {
         return rejectWithValue(error.message);
       } else {
-        return rejectWithValue('An unknown error occurred');
+        return rejectWithValue("An unknown error occurred");
       }
     }
   }
@@ -151,7 +202,10 @@ export const completeMarxistPhilosophyLesson = createAsyncThunk(
 export const retryMarxistPhilosophyLesson = createAsyncThunk(
   "philosophy/retryLesson",
   async (data: { lessonId: string; pathId?: string }) => {
-    const response = await axiosInstance.post(RETRY_MARXIST_PHILOSOPHY_LESSON_ENDPOINT, data);
+    const response = await axiosInstance.post(
+      RETRY_MARXIST_PHILOSOPHY_LESSON_ENDPOINT,
+      data
+    );
     return response.data;
   }
 );
@@ -160,7 +214,9 @@ export const retryMarxistPhilosophyLesson = createAsyncThunk(
 export const getMarxistPhilosophyStats = createAsyncThunk(
   "philosophy/getStats",
   async () => {
-    const response = await axiosInstance.get(GET_MARXIST_PHILOSOPHY_STATS_ENDPOINT);
+    const response = await axiosInstance.get(
+      GET_MARXIST_PHILOSOPHY_STATS_ENDPOINT
+    );
     return response.data as IMarxistPhilosophyStatsResponse;
   }
 );
@@ -169,7 +225,9 @@ export const getMarxistPhilosophyStats = createAsyncThunk(
 export const getMarxistPhilosophyTopics = createAsyncThunk(
   "philosophy/getTopics",
   async () => {
-    const response = await axiosInstance.get(GET_MARXIST_PHILOSOPHY_TOPICS_ENDPOINT);
+    const response = await axiosInstance.get(
+      GET_MARXIST_PHILOSOPHY_TOPICS_ENDPOINT
+    );
     return response.data;
   }
 );
@@ -178,8 +236,114 @@ export const getMarxistPhilosophyTopics = createAsyncThunk(
 export const analyzeMarxistPhilosophyProgress = createAsyncThunk(
   "philosophy/analyzeProgress",
   async () => {
-    const response = await axiosInstance.get(ANALYZE_MARXIST_PHILOSOPHY_PROGRESS_ENDPOINT);
+    const response = await axiosInstance.get(
+      ANALYZE_MARXIST_PHILOSOPHY_PROGRESS_ENDPOINT
+    );
     return response.data;
+  }
+);
+
+// 📚 Generate Content Pack (pre-study)
+export const generateContentPack = createAsyncThunk(
+  "philosophy/generateContentPack",
+  async (payload: IGenerateContentPackPayload, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post(
+        GENERATE_CONTENT_PACK_ENDPOINT,
+        payload
+      );
+      return response.data as IGenerateContentPackResponse;
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        const errorData = error.response?.data;
+        if (errorData?.statusCode === 429) {
+          // Background generation in progress
+          return rejectWithValue({
+            statusCode: 429,
+            message:
+              errorData.message ||
+              "Hệ thống đang tạo bài học tự động, vui lòng chờ...",
+          });
+        }
+        return rejectWithValue({
+          statusCode: error.response?.status || 500,
+          message:
+            errorData?.message ||
+            error.message ||
+            "Failed to generate content pack",
+        });
+      }
+      return rejectWithValue({
+        statusCode: 500,
+        message: "Unknown error occurred",
+      });
+    }
+  }
+);
+
+// 📚 Get Latest Content Pack (fetch from BE)
+export const getLatestContentPack = createAsyncThunk(
+  "philosophy/getLatestContentPack",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(
+        GET_LATEST_CONTENT_PACK_ENDPOINT
+      );
+      return response.data as IGenerateContentPackResponse;
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        const errorData = error.response?.data;
+        return rejectWithValue({
+          statusCode: error.response?.status || 500,
+          message:
+            errorData?.message ||
+            error.message ||
+            "Failed to get latest content pack",
+        });
+      }
+      return rejectWithValue({
+        statusCode: 500,
+        message: "Unknown error occurred",
+      });
+    }
+  }
+);
+
+// 🧠 Generate Lesson From Content Pack
+export const generateLessonFromContent = createAsyncThunk(
+  "philosophy/generateLessonFromContent",
+  async (payload: IGenerateLessonFromContentPayload, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post(
+        GENERATE_LESSON_FROM_CONTENT_ENDPOINT,
+        payload
+      );
+      return response.data as IGenerateMarxistPhilosophyLessonResponse;
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        const errorData = error.response?.data;
+        if (errorData?.statusCode === 429) {
+          // Background generation in progress
+          return rejectWithValue({
+            statusCode: 429,
+            message:
+              errorData.message ||
+              "Hệ thống đang tạo bài học tự động, vui lòng chờ...",
+          });
+        }
+        return rejectWithValue({
+          statusCode: error.response?.status || 500,
+          message:
+            errorData?.message ||
+            error.message ||
+            "Failed to generate lesson from content",
+        });
+      }
+      return rejectWithValue({
+        statusCode: 500,
+        message: "Unknown error occurred",
+      });
+    }
   }
 );
 
@@ -187,7 +351,9 @@ export const analyzeMarxistPhilosophyProgress = createAsyncThunk(
 export const testMultiAIConnection = createAsyncThunk(
   "philosophy/testMultiAI",
   async () => {
-    const response = await axiosInstance.get(TEST_MARXIST_PHILOSOPHY_CONNECTION_ENDPOINT);
+    const response = await axiosInstance.get(
+      TEST_MARXIST_PHILOSOPHY_CONNECTION_ENDPOINT
+    );
     return response.data;
   }
 );
@@ -196,7 +362,9 @@ export const testMultiAIConnection = createAsyncThunk(
 export const testMarxistPhilosophyConnection = createAsyncThunk(
   "philosophy/testConnection",
   async () => {
-    const response = await axiosInstance.get(TEST_MARXIST_PHILOSOPHY_CONNECTION_ENDPOINT);
+    const response = await axiosInstance.get(
+      TEST_MARXIST_PHILOSOPHY_CONNECTION_ENDPOINT
+    );
     return response.data;
   }
 );
@@ -205,7 +373,10 @@ export const testMarxistPhilosophyConnection = createAsyncThunk(
 export const testMarxistPhilosophyGeminiAPI = createAsyncThunk(
   "philosophy/testGeminiAPI",
   async (data: { prompt?: string }) => {
-    const response = await axiosInstance.post(TEST_MARXIST_PHILOSOPHY_GEMINI_ENDPOINT, data);
+    const response = await axiosInstance.post(
+      TEST_MARXIST_PHILOSOPHY_GEMINI_ENDPOINT,
+      data
+    );
     return response.data;
   }
 );
@@ -214,7 +385,10 @@ export const testMarxistPhilosophyGeminiAPI = createAsyncThunk(
 export const createMarxistPhilosophyTopic = createAsyncThunk(
   "philosophy/createTopic",
   async (topicData: ICreateMarxistPhilosophyTopicData) => {
-    const response = await axiosInstance.post(CREATE_MARXIST_PHILOSOPHY_TOPIC_ENDPOINT, topicData);
+    const response = await axiosInstance.post(
+      CREATE_MARXIST_PHILOSOPHY_TOPIC_ENDPOINT,
+      topicData
+    );
     return response.data;
   }
 );
@@ -222,7 +396,10 @@ export const createMarxistPhilosophyTopic = createAsyncThunk(
 export const getMarxistPhilosophyTopicsList = createAsyncThunk(
   "philosophy/getTopicsList",
   async (params: { page?: number; limit?: number } = {}) => {
-    const response = await axiosInstance.get(GET_MARXIST_PHILOSOPHY_TOPICS_LIST_ENDPOINT, { params });
+    const response = await axiosInstance.get(
+      GET_MARXIST_PHILOSOPHY_TOPICS_LIST_ENDPOINT,
+      { params }
+    );
     return response.data;
   }
 );
@@ -230,15 +407,26 @@ export const getMarxistPhilosophyTopicsList = createAsyncThunk(
 export const getMarxistPhilosophyTopicById = createAsyncThunk(
   "philosophy/getTopicById",
   async (id: string) => {
-    const response = await axiosInstance.get(GET_MARXIST_PHILOSOPHY_TOPIC_BY_ID_ENDPOINT(id));
+    const response = await axiosInstance.get(
+      GET_MARXIST_PHILOSOPHY_TOPIC_BY_ID_ENDPOINT(id)
+    );
     return response.data;
   }
 );
 
 export const updateMarxistPhilosophyTopic = createAsyncThunk(
   "philosophy/updateTopic",
-  async ({ id, data }: { id: string; data: IUpdateMarxistPhilosophyTopicData }) => {
-    const response = await axiosInstance.put(UPDATE_MARXIST_PHILOSOPHY_TOPIC_ENDPOINT(id), data);
+  async ({
+    id,
+    data,
+  }: {
+    id: string;
+    data: IUpdateMarxistPhilosophyTopicData;
+  }) => {
+    const response = await axiosInstance.put(
+      UPDATE_MARXIST_PHILOSOPHY_TOPIC_ENDPOINT(id),
+      data
+    );
     return response.data;
   }
 );
@@ -246,7 +434,9 @@ export const updateMarxistPhilosophyTopic = createAsyncThunk(
 export const deleteMarxistPhilosophyTopic = createAsyncThunk(
   "philosophy/deleteTopic",
   async (id: string) => {
-    const response = await axiosInstance.delete(DELETE_MARXIST_PHILOSOPHY_TOPIC_ENDPOINT(id));
+    const response = await axiosInstance.delete(
+      DELETE_MARXIST_PHILOSOPHY_TOPIC_ENDPOINT(id)
+    );
     return response.data;
   }
 );
@@ -254,13 +444,15 @@ export const deleteMarxistPhilosophyTopic = createAsyncThunk(
 export const seedMarxistPhilosophyTopics = createAsyncThunk(
   "philosophy/seedTopics",
   async () => {
-    const response = await axiosInstance.post(SEED_MARXIST_PHILOSOPHY_TOPICS_ENDPOINT);
+    const response = await axiosInstance.post(
+      SEED_MARXIST_PHILOSOPHY_TOPICS_ENDPOINT
+    );
     return response.data;
   }
 );
 
 const philosophySlice = createSlice({
-  name: 'philosophy',
+  name: "philosophy",
   initialState,
   reducers: {
     clearPhilosophyError: (state) => {
@@ -286,7 +478,7 @@ const philosophySlice = createSlice({
       })
       .addCase(generateMarxistPhilosophyLesson.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string || 'Failed to generate lesson';
+        state.error = (action.payload as string) || "Failed to generate lesson";
       })
 
       // Get learning path
@@ -300,7 +492,7 @@ const philosophySlice = createSlice({
       })
       .addCase(getMarxistPhilosophyLearningPath.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to get learning path';
+        state.error = action.error.message || "Failed to get learning path";
       })
 
       // Get lesson by path
@@ -314,7 +506,7 @@ const philosophySlice = createSlice({
       })
       .addCase(getMarxistPhilosophyLessonByPath.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to get lesson';
+        state.error = action.error.message || "Failed to get lesson";
       })
 
       // Complete lesson
@@ -328,7 +520,7 @@ const philosophySlice = createSlice({
       })
       .addCase(completeMarxistPhilosophyLesson.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string || 'Failed to complete lesson';
+        state.error = (action.payload as string) || "Failed to complete lesson";
       })
 
       // Retry lesson
@@ -342,7 +534,7 @@ const philosophySlice = createSlice({
       })
       .addCase(retryMarxistPhilosophyLesson.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to retry lesson';
+        state.error = action.error.message || "Failed to retry lesson";
       })
 
       // Get stats
@@ -356,7 +548,7 @@ const philosophySlice = createSlice({
       })
       .addCase(getMarxistPhilosophyStats.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to get stats';
+        state.error = action.error.message || "Failed to get stats";
       })
 
       // Get topics
@@ -370,7 +562,7 @@ const philosophySlice = createSlice({
       })
       .addCase(getMarxistPhilosophyTopics.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to get topics';
+        state.error = action.error.message || "Failed to get topics";
       })
 
       // Topic management cases
@@ -387,6 +579,51 @@ const philosophySlice = createSlice({
         state.success = action.payload.message;
       })
 
+      // Generate content pack
+      .addCase(generateContentPack.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(generateContentPack.fulfilled, (state, action) => {
+        state.loading = false;
+        state.contentPack = action.payload.contentPack;
+        state.success = "Đã tạo học liệu tóm tắt thành công";
+      })
+      .addCase(generateContentPack.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Không thể tạo học liệu tóm tắt";
+      })
+
+      // Get latest content pack
+      .addCase(getLatestContentPack.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getLatestContentPack.fulfilled, (state, action) => {
+        state.loading = false;
+        state.contentPack = action.payload.contentPack;
+        console.log("✅ Latest ContentPack fetched and updated in Redux state");
+      })
+      .addCase(getLatestContentPack.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Không thể lấy học liệu mới nhất";
+      })
+
+      // Generate lesson from content
+      .addCase(generateLessonFromContent.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(generateLessonFromContent.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = action.payload.message;
+      })
+      .addCase(generateLessonFromContent.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          action.error.message || "Không thể tạo bài học từ học liệu";
+      })
+
       // Test Multi-AI connection
       .addCase(testMultiAIConnection.pending, (state) => {
         state.loading = true;
@@ -395,17 +632,20 @@ const philosophySlice = createSlice({
       .addCase(testMultiAIConnection.fulfilled, (state, action) => {
         state.loading = false;
         state.multiAI.connected = action.payload.success;
-        state.multiAI.providers.gemini = action.payload.results?.gemini?.connected || false;
-        state.multiAI.providers.grok = action.payload.results?.grok?.connected || false;
+        state.multiAI.providers.gemini =
+          action.payload.results?.gemini?.connected || false;
+        state.multiAI.providers.grok =
+          action.payload.results?.grok?.connected || false;
         state.multiAI.lastTest = new Date().toISOString();
         state.success = action.payload.message;
-        
+
         // Update legacy geminiConnected for backward compatibility
-        state.geminiConnected = action.payload.results?.gemini?.connected || false;
+        state.geminiConnected =
+          action.payload.results?.gemini?.connected || false;
       })
       .addCase(testMultiAIConnection.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Multi-AI connection test failed';
+        state.error = action.error.message || "Multi-AI connection test failed";
         state.multiAI.connected = false;
         state.multiAI.providers.gemini = false;
         state.multiAI.providers.grok = false;
@@ -421,5 +661,9 @@ const philosophySlice = createSlice({
   },
 });
 
-export const { clearPhilosophyError, clearPhilosophySuccess, setPhilosophyLoading } = philosophySlice.actions;
+export const {
+  clearPhilosophyError,
+  clearPhilosophySuccess,
+  setPhilosophyLoading,
+} = philosophySlice.actions;
 export default philosophySlice.reducer;

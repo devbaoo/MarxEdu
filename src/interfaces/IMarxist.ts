@@ -299,3 +299,56 @@ export interface IGeminiConnectionResponse {
   message: string;
   connected: boolean;
 } 
+
+// ========= Pre-study Content Pack =========
+export interface IContentPack {
+  title: string;
+  topicId?: string;
+  topicName?: string;
+  level?: string;
+  goal?: string;
+  summary?: string;
+  keyPoints?: string[];
+  mindmapNodes?: Array<{
+    id: string;
+    label: string;
+    children?: Array<{ id: string; label: string; children?: Array<any> }>;
+  }>;
+  flashcards?: Array<{
+    term: string;
+    definition: string;
+    example?: string;
+    tags?: string[];
+    difficulty?: 'easy' | 'medium' | 'hard';
+  }>;
+  slideOutline?: string[];
+  readingTime?: number;
+  sources?: Array<any>;
+}
+
+export interface IGenerateContentPackPayload {
+  topicId?: string;
+  topicName?: string;
+  level?: string;
+  goal?: string;
+  include?: {
+    summary?: boolean;
+    keyPoints?: boolean;
+    mindmap?: boolean;
+    flashcards?: boolean;
+    slideOutline?: boolean;
+  };
+}
+
+export interface IGenerateContentPackResponse {
+  success: boolean;
+  contentPack: IContentPack;
+}
+
+export interface IGenerateLessonFromContentPayload {
+  topicId?: string;
+  topicName?: string;
+  level?: string;
+  goal?: string;
+  questionCount?: number; // default 10
+}
