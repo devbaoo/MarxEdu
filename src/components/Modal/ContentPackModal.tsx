@@ -1,5 +1,8 @@
-import React from "react";
-import { Modal, Typography, List, Tag, Button, Divider } from "antd";
+import React, { useEffect, useMemo, useState } from "react";
+import { Modal, Typography, List, Button, Divider } from "antd";
+import { LeftOutlined, RightOutlined } from "@ant-design/icons";
+import FlashcardCard from "@/components/Flashcard/FlashcardCard";
+import { IFlashcard } from "@/interfaces/IFlashcard";
 import { IContentPack } from "@/interfaces/IMarxist";
 
 const { Title, Text, Paragraph } = Typography;
@@ -19,6 +22,43 @@ const ContentPackModal: React.FC<ContentPackModalProps> = ({
   onClose,
   onConfirmStudyDone,
 }) => {
+  const previewFlashcards: IFlashcard[] = useMemo(() => {
+    if (!Array.isArray(content?.flashcards)) {
+      return [];
+    }
+
+    return content.flashcards.slice(0, 6).map((fc, idx) => {
+      const back = [fc.definition, fc.example && `Ví dụ: ${fc.example}`]
+        .filter(Boolean)
+        .join("\n\n");
+
+      return {
+        id: `content-pack-${idx}-${fc.term || idx}`,
+        front: fc.term?.trim() || "Flashcard",
+        back: back || "Chưa có nội dung",
+        tags: fc.tags ?? [],
+      };
+    });
+  }, [content?.flashcards]);
+
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+    setActiveIndex(0);
+  }, [previewFlashcards.length]);
+
+  const handlePrev = () => {
+    setActiveIndex((prev) => Math.max(prev - 1, 0));
+  };
+
+  const handleNext = () => {
+    setActiveIndex((prev) =>
+      Math.min(prev + 1, Math.max(previewFlashcards.length - 1, 0))
+    );
+  };
+
+  const activeFlashcard = previewFlashcards[activeIndex];
+
   return (
     <Modal
       open={open}
@@ -54,47 +94,38 @@ const ContentPackModal: React.FC<ContentPackModalProps> = ({
             </div>
           )}
 
-          {Array.isArray(content.slideOutline) &&
-            content.slideOutline.length > 0 && (
-              <div className="mb-4">
-                <Title level={5}>🗂️ Slide digest</Title>
-                <List
-                  dataSource={content.slideOutline}
-                  renderItem={(item, idx) => (
-                    <List.Item>
-                      Slide {idx + 1}: {item}
-                    </List.Item>
-                  )}
-                  size="small"
-                />
-              </div>
-            )}
+          {activeFlashcard && (
+            <div className="mb-4">
+              <Title level={5}>🧠 Flashcards</Title>
+              <div className="space-y-3">
+                <div className="min-h-[260px]">
+                  <FlashcardCard flashcard={activeFlashcard} />
+                </div>
 
-          {Array.isArray(content.flashcards) &&
-            content.flashcards.length > 0 && (
-              <div className="mb-4">
-                <Title level={5}>🧠 Flashcards</Title>
-                <List
-                  dataSource={content.flashcards.slice(0, 6)}
-                  renderItem={(fc) => (
-                    <List.Item>
-                      <div>
-                        <Text strong>{fc.term}</Text>
-                        <div className="text-gray-700">{fc.definition}</div>
-                        {fc.tags && fc.tags.length > 0 && (
-                          <div className="mt-1 flex gap-1 flex-wrap">
-                            {fc.tags.slice(0, 4).map((t) => (
-                              <Tag key={t}>{t}</Tag>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </List.Item>
-                  )}
-                  size="small"
-                />
+                <div className="flex items-center justify-between">
+                  <Text type="secondary">
+                    Flashcard {activeIndex + 1}/{previewFlashcards.length}
+                  </Text>
+                  <div className="flex gap-2">
+                    <Button
+                      icon={<LeftOutlined />}
+                      onClick={handlePrev}
+                      disabled={activeIndex === 0}
+                    >
+                      Trước
+                    </Button>
+                    <Button
+                      icon={<RightOutlined />}
+                      onClick={handleNext}
+                      disabled={activeIndex >= previewFlashcards.length - 1}
+                    >
+                      Sau
+                    </Button>
+                  </div>
+                </div>
               </div>
-            )}
+            </div>
+          )}
 
           <Divider />
           <Text type="secondary">
