@@ -116,8 +116,7 @@ const PhilosophyLessonDetailPage: React.FC = () => {
           />
           <Button
             icon={<ArrowLeftOutlined />}
-            onClick={() => navigate("/philosophy")}
-          >
+            onClick={() => navigate("/philosophy")}>
             Quay lại trang chủ
           </Button>
         </div>
@@ -137,8 +136,7 @@ const PhilosophyLessonDetailPage: React.FC = () => {
             type="primary"
             icon={<ArrowLeftOutlined />}
             onClick={() => navigate("/philosophy")}
-            className="mt-4"
-          >
+            className="mt-4">
             Quay lại trang chủ
           </Button>
         </div>
@@ -154,8 +152,7 @@ const PhilosophyLessonDetailPage: React.FC = () => {
           icon={<ArrowLeftOutlined />}
           onClick={() => navigate("/philosophy")}
           className="mb-6"
-          size="large"
-        >
+          size="large">
           Quay lại lộ trình học tập
         </Button>
 
@@ -183,8 +180,7 @@ const PhilosophyLessonDetailPage: React.FC = () => {
                     color={getDifficultyColor(
                       typeof lesson.level === "object" ? 1 : lesson.level
                     )}
-                    className="mt-1"
-                  >
+                    className="mt-1">
                     {getDifficultyText(
                       typeof lesson.level === "object" ? 1 : lesson.level
                     )}
@@ -226,9 +222,9 @@ const PhilosophyLessonDetailPage: React.FC = () => {
               <Text strong>Thời gian làm bài</Text>
             </div>
             <Text>
-              Bạn có <strong>5 phút</strong> để hoàn thành bài kiểm tra này.
-              Hãy đọc kỹ từng câu hỏi và suy nghĩ cẩn thận trước khi chọn đáp
-              án.
+
+              Bạn có <strong>5 phút</strong> để hoàn thành bài kiểm tra này. Hãy
+              đọc kỹ từng câu hỏi và suy nghĩ cẩn thận trước khi chọn đáp án.
             </Text>
           </div>
 
@@ -292,8 +288,7 @@ const PhilosophyLessonDetailPage: React.FC = () => {
               size="large"
               icon={<BookOutlined />}
               onClick={() => navigate(`/philosophy-test/${pathId}`)}
-              className="bg-red-600 hover:bg-red-700 px-8 py-2 h-auto text-lg"
-            >
+              className="bg-red-600 hover:bg-red-700 px-8 py-2 h-auto text-lg">
               🚀 Bắt đầu bài học
             </Button>
           </div>
