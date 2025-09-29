@@ -30,7 +30,6 @@ import {
   getMarxistPhilosophyLearningPath,
   clearPhilosophyError,
   clearPhilosophySuccess,
-  generateContentPack,
   getLatestContentPack,
 } from "@/services/features/marxist/philosophySlice";
 import ContentPackModal from "@/components/Modal/ContentPackModal";
@@ -79,12 +78,12 @@ const PhilosophyDashboard: React.FC = () => {
     dispatch(getMarxistPhilosophyLearningPath({}));
   }, [dispatch]);
 
-  // Monitor contentPack changes from BE background generation (but don't auto-popup)
+  // Monitor contentPack changes (for manual ContentPack usage)
   useEffect(() => {
     if (contentPack && !isContentModalOpen) {
-      console.log("📚 ContentPack received from BE, ready for manual display");
+      console.log("📚 ContentPack available for manual use");
 
-      // Set topic info for quiz generation (but don't show modal automatically)
+      // Set topic info for quiz generation if available
       if (contentPack.topicId && contentPack.topicName) {
         setCurrentTopicForContent({
           topicId: contentPack.topicId,
@@ -131,62 +130,15 @@ const PhilosophyDashboard: React.FC = () => {
         duration: 6,
       });
 
-      // Implement new flow: Generate ContentPack first, then show modal
+      // Simplified flow: Just navigate to lesson after successful generation
       if (result.success && result.learningPath?.pathId) {
         const pathId = result.learningPath.pathId;
-        console.log(
-          "ℹ️ Lesson created (pathId)",
-          pathId,
-          "generating ContentPack first"
-        );
+        console.log("✅ Lesson created successfully, navigating to:", pathId);
 
-        // Get topic info for ContentPack generation
-        const marxistTopic = result.learningPath.marxistTopic;
-        if (marxistTopic) {
-          setCurrentTopicForContent({
-            topicId: marxistTopic.id,
-            topicName: marxistTopic.title || marxistTopic.name,
-            level: "intermediate",
-          });
-        }
-
-        // Generate ContentPack for pre-study flow (but don't show modal automatically)
-        try {
-          await dispatch(
-            generateContentPack({
-              topicId: marxistTopic?.id,
-              topicName:
-                result.lesson?.title ||
-                marxistTopic?.title ||
-                marxistTopic?.name, // Use actual lesson title
-              level: "intermediate",
-              goal: `Ôn tập cho bài học: ${
-                result.lesson?.title ||
-                marxistTopic?.title ||
-                marxistTopic?.name
-              }`, // Match BE format
-              include: {
-                summary: true,
-                keyPoints: true,
-                mindmap: true,
-                slideOutline: true,
-                flashcards: true,
-              },
-            })
-          ).unwrap();
-
-          console.log("✅ ContentPack generated, ready for manual display");
-          // Navigate directly to lesson - user will click "Học" to see ContentPack
-          setTimeout(() => {
-            window.location.href = `/philosophy-lesson/${pathId}`;
-          }, 500);
-        } catch (contentError) {
-          console.warn("ContentPack generation failed:", contentError);
-          // Fallback: navigate directly to lesson
-          setTimeout(() => {
-            window.location.href = `/philosophy-lesson/${pathId}`;
-          }, 500);
-        }
+        // Navigate directly to lesson without ContentPack generation
+        setTimeout(() => {
+          window.location.href = `/philosophy-lesson/${pathId}`;
+        }, 500);
       }
 
       // Alternative: Check if lesson was created and use lessonId as fallback
