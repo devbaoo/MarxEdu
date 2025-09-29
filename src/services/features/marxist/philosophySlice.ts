@@ -478,7 +478,17 @@ const philosophySlice = createSlice({
       })
       .addCase(generateMarxistPhilosophyLesson.rejected, (state, action) => {
         state.loading = false;
-        state.error = (action.payload as string) || "Failed to generate lesson";
+        // Handle error payload properly - can be string or object with message
+        const errorPayload = action.payload as
+          | { message?: string; statusCode?: number }
+          | string;
+        if (typeof errorPayload === "string") {
+          state.error = errorPayload;
+        } else if (errorPayload?.message) {
+          state.error = errorPayload.message;
+        } else {
+          state.error = "Failed to generate lesson";
+        }
       })
 
       // Get learning path

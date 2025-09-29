@@ -411,7 +411,27 @@ const PhilosophyDashboard: React.FC = () => {
         {error && !isTopicError && (
           <Alert
             message="Có lỗi xảy ra"
-            description={error}
+            description={
+              <div>
+                <p>{error}</p>
+                {/* Show retry button for AI failures */}
+                {(error.includes("AI APIs") ||
+                  error.includes("503") ||
+                  error.includes("generation failed") ||
+                  error.includes("JSON") ||
+                  error.includes("timeout")) && (
+                  <Button
+                    type="primary"
+                    size="small"
+                    icon={<ReloadOutlined />}
+                    onClick={() => handleGenerateLesson()}
+                    loading={loading}
+                    className="mt-2 bg-red-600 hover:bg-red-700">
+                    🔄 Thử lại với AI
+                  </Button>
+                )}
+              </div>
+            }
             type="error"
             showIcon
             closable
@@ -435,8 +455,7 @@ const PhilosophyDashboard: React.FC = () => {
                   type="primary"
                   icon={<PlusOutlined />}
                   className="mt-2"
-                  onClick={() => navigate("/staff/philosophy-topics")}
-                >
+                  onClick={() => navigate("/staff/philosophy-topics")}>
                   Đi tới trang quản lý chủ đề
                 </Button>
               </div>
@@ -459,8 +478,7 @@ const PhilosophyDashboard: React.FC = () => {
                   <span>Lộ trình học tập triết học</span>
                 </div>
               }
-              className="shadow-lg"
-            >
+              className="shadow-lg">
               {loading ? (
                 <div className="text-center py-8">
                   <Spin size="large" />
@@ -484,8 +502,7 @@ const PhilosophyDashboard: React.FC = () => {
                     icon={<RocketOutlined />}
                     onClick={() => handleGenerateLesson()}
                     loading={loading}
-                    className="bg-red-600 hover:bg-red-700"
-                  >
+                    className="bg-red-600 hover:bg-red-700">
                     🤖 Tạo bài học đầu tiên với AI
                   </Button>
                 </div>
@@ -505,16 +522,14 @@ const PhilosophyDashboard: React.FC = () => {
                             : isNewest
                             ? "border-l-blue-500 bg-blue-50"
                             : "border-l-gray-300 bg-gray-50"
-                        } hover:shadow-md transition-all`}
-                      >
+                        } hover:shadow-md transition-all`}>
                         <div className="flex justify-between items-start">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
                               <span
                                 className={`text-lg ${
                                   item.completed ? "🎉" : isNewest ? "🚀" : "📚"
-                                }`}
-                              >
+                                }`}>
                                 {item.completed ? "🎉" : isNewest ? "🚀" : "📚"}
                               </span>
                               <Title level={5} className="mb-0">
@@ -529,8 +544,9 @@ const PhilosophyDashboard: React.FC = () => {
 
                             <div className="flex flex-wrap gap-2 mb-2">
                               <Tag
-                                color={getDifficultyColor(item.difficultyLevel)}
-                              >
+                                color={getDifficultyColor(
+                                  item.difficultyLevel
+                                )}>
                                 {getDifficultyText(item.difficultyLevel)}
                               </Tag>
                               <Tag color="purple">
@@ -562,8 +578,7 @@ const PhilosophyDashboard: React.FC = () => {
                                   }}
                                   className="bg-blue-100 hover:bg-blue-200 border-blue-300"
                                   style={{ fontSize: "11px" }}
-                                  icon={<EyeOutlined />}
-                                >
+                                  icon={<EyeOutlined />}>
                                   Xem chi tiết
                                 </Button>
 
@@ -576,8 +591,7 @@ const PhilosophyDashboard: React.FC = () => {
                                   }}
                                   className="bg-yellow-100 hover:bg-yellow-200 border-yellow-400"
                                   style={{ fontSize: "11px" }}
-                                  icon={<ReloadOutlined />}
-                                >
+                                  icon={<ReloadOutlined />}>
                                   🔄 Làm lại (-1 ❤️)
                                 </Button>
                               </div>
@@ -598,7 +612,7 @@ const PhilosophyDashboard: React.FC = () => {
                                     console.log("📦 API Response:", result);
 
                                     // Prefer using API response directly to decide modal
-                                    const cp = (result as any)?.contentPack;
+                                    const cp = result?.contentPack;
                                     console.log("🔍 ContentPack from API:", cp);
 
                                     if (cp && (cp.topicName || cp.title)) {
@@ -640,8 +654,7 @@ const PhilosophyDashboard: React.FC = () => {
                                   ) : (
                                     <EyeOutlined />
                                   )
-                                }
-                              >
+                                }>
                                 {isNewest ? "🚀 Học ngay!" : "👀 Xem chi tiết"}
                               </Button>
                             )}
@@ -692,8 +705,7 @@ const PhilosophyDashboard: React.FC = () => {
                     <span>Tạo bài học với AI</span>
                   </div>
                 }
-                className="shadow-lg"
-              >
+                className="shadow-lg">
                 {hasIncompleteLesson ? (
                   <div>
                     <Alert
@@ -734,8 +746,7 @@ const PhilosophyDashboard: React.FC = () => {
                           }
                         }
                       }}
-                      className="bg-blue-600 hover:bg-blue-700"
-                    >
+                      className="bg-blue-600 hover:bg-blue-700">
                       📖 Tiếp tục học bài hiện tại
                     </Button>
                   </div>
@@ -753,8 +764,7 @@ const PhilosophyDashboard: React.FC = () => {
                       icon={<RocketOutlined />}
                       onClick={() => handleGenerateLesson()}
                       loading={loading}
-                      className="bg-red-600 hover:bg-red-700"
-                    >
+                      className="bg-red-600 hover:bg-red-700">
                       🤖 Tạo bài học với AI
                     </Button>
                   </div>
@@ -769,21 +779,18 @@ const PhilosophyDashboard: React.FC = () => {
                     <span>Thao tác nhanh</span>
                   </div>
                 }
-                className="shadow-lg"
-              >
+                className="shadow-lg">
                 <Space direction="vertical" className="w-full">
                   <Button
                     block
                     icon={<TrophyOutlined />}
-                    onClick={() => navigate("/rank")}
-                  >
+                    onClick={() => navigate("/rank")}>
                     📊 Xem bảng xếp hạng
                   </Button>
                   <Button
                     block
                     icon={<BookOutlined />}
-                    onClick={() => navigate("/profile")}
-                  >
+                    onClick={() => navigate("/profile")}>
                     👤 Thông tin cá nhân
                   </Button>
                 </Space>
