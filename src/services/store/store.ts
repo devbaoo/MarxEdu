@@ -14,6 +14,7 @@ import packageReducer from "../features/package/packageSlice";
 import philosophyReducer from "../features/marxist/philosophySlice";
 import checkInReducer from "../features/checkin/checkInSlice";
 import surveyReducer from "../features/survey/surveySlice";
+import flashcardReducer from "../features/flashcard/flashcardSlice";
 
 const presistConfig = {
   key: "root",
@@ -27,6 +28,7 @@ const presistConfig = {
     "philosophy",
     "checkIn",
     "survey",
+    "flashcard",
   ], // Removed deprecated: lesson, topic, level, skill, marxist
 };
 
@@ -44,6 +46,7 @@ const rootReducer = combineReducers({
   philosophy: philosophyReducer,
   checkIn: checkInReducer,
   survey: surveyReducer,
+  flashcard: flashcardReducer,
   // Add other reducers here as needed
 });
 

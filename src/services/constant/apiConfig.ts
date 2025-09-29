@@ -109,6 +109,13 @@ export const GENERATE_CONTENT_PACK_ENDPOINT = `${BASE_URL}/marxist-philosophy/co
 export const GET_LATEST_CONTENT_PACK_ENDPOINT = `${BASE_URL}/marxist-philosophy/content/latest`;
 export const GENERATE_LESSON_FROM_CONTENT_ENDPOINT = `${BASE_URL}/marxist-philosophy/lesson-from-content`;
 
+// flashcards
+export const GET_FLASHCARDS_ENDPOINT = `${BASE_URL}/flashcards`;
+export const GET_FLASHCARD_BY_ID_ENDPOINT = (id: string) =>
+  `${BASE_URL}/flashcards/${id}`;
+export const GET_FLASHCARD_TAGS_ENDPOINT = `${BASE_URL}/flashcards/tags`;
+export const GET_RANDOM_FLASHCARDS_ENDPOINT = `${BASE_URL}/flashcards/random`;
+
 //marxist philosophy topics management - BACKEND USES MARXIST-TOPICS NOT MARXIST-PHILOSOPHY-TOPICS
 export const CREATE_MARXIST_PHILOSOPHY_TOPIC_ENDPOINT = `${BASE_URL}/marxist-topics`;
 export const GET_MARXIST_PHILOSOPHY_TOPICS_LIST_ENDPOINT = `${BASE_URL}/marxist-topics`;

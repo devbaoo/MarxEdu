@@ -8,6 +8,7 @@ import {
   TrophyOutlined,
   GiftOutlined,
   UserOutlined,
+  ReadOutlined,
 } from "@ant-design/icons";
 
 const menuItems = [
@@ -22,6 +23,13 @@ const menuItems = [
     ),
     label: "Bảng xếp hạng",
     href: "/rank",
+  },
+  {
+    iconElement: (
+      <ReadOutlined style={{ fontSize: "24px", color: "#2563eb" }} />
+    ),
+    label: "Flashcards",
+    href: "/flashcards",
   },
   {
     iconElement: <GiftOutlined />,

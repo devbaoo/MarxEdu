@@ -50,6 +50,7 @@ import MultiAITestPage from "@/page/Staff/MultiAITestPage";
 import PhilosophyLessonDetailPage from "@/page/Philosophy/PhilosophyLessonDetailPage";
 import SurveyManagementPage from "@/page/Admin/SurveyManagementPage";
 import PhilosophyLessonTestPage from "@/page/Philosophy/PhilosophyLessonTestPage";
+import FlashcardsPage from "@/page/Philosophy/FlashcardsPage";
 
 const AppRouter = () => {
   const { isAuthenticated, user } = useSelector(
@@ -127,6 +128,7 @@ const AppRouter = () => {
           <Route path="/rank" element={<Rank />} />
           <Route path="/packages" element={<Package />} />
           <Route path="/philosophy" element={<PhilosophyDashboard />} />
+          <Route path="/flashcards" element={<FlashcardsPage />} />
           <Route
             path="/philosophy-lesson/:pathId"
             element={<PhilosophyLessonDetailPage />}
