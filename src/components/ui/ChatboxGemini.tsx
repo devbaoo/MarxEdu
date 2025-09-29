@@ -9,34 +9,67 @@ import {
 
 const { TextArea } = Input;
 
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-const GEMINI_URL =
-  "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
+const OPENROUTER_MODEL =
+  import.meta.env.VITE_OPENROUTER_MODEL || "x-ai/grok-4-fast:free";
+const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 
 const SYSTEM_PROMPT =
   "Bạn là chuyên gia về triết học Mác Lê Nin, giúp tôi trả lời các câu hỏi về chủ đề này. Luôn trả lời toàn bộ bằng tiếng Việt.";
 
-async function askGemini(prompt: string): Promise<string> {
+async function askGrok(prompt: string): Promise<string> {
+  if (!OPENROUTER_API_KEY) {
+    return "Chưa cấu hình khóa API OpenRouter.";
+  }
   try {
-    const res = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
+    const referer =
+      typeof window !== "undefined" && window.location?.origin
+        ? window.location.origin
+        : "https://marx-edu.local";
+    const res = await fetch(OPENROUTER_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+        "HTTP-Referer": referer,
+        "X-Title": "MarxEdu",
+      },
       body: JSON.stringify({
-        contents: [
+        model: OPENROUTER_MODEL,
+        messages: [
           {
-            parts: [{ text: SYSTEM_PROMPT }, { text: prompt }],
+            role: "system",
+            content: [{ type: "text", text: SYSTEM_PROMPT }],
+          },
+          {
+            role: "user",
+            content: [{ type: "text", text: prompt }],
           },
         ],
       }),
     });
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error("OpenRouter error", res.status, errorText);
+      return "Không thể kết nối tới Grok. Vui lòng thử lại.";
+    }
     const data = await res.json();
-    // Gemini API trả về dạng: { candidates: [{ content: { parts: [{ text: "..." }] } }] }
-    return (
-      data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "Không có phản hồi từ AI."
-    );
-  } catch {
-    return "Lỗi khi gửi câu hỏi đến Gemini AI.";
+    // OpenRouter trả về dạng: { choices: [{ message: { content: "..." | [{type,text}...] } }] }
+    const messageContent = data?.choices?.[0]?.message?.content;
+    if (typeof messageContent === "string") {
+      return messageContent.trim() || "Không có phản hồi từ AI.";
+    }
+    if (Array.isArray(messageContent)) {
+      const combinedText = messageContent
+        .filter((part) => part?.type === "text" && typeof part.text === "string")
+        .map((part) => part.text as string)
+        .join("\n\n");
+      return combinedText.trim() || "Không có phản hồi từ AI.";
+    }
+    return "Không có phản hồi từ AI.";
+  } catch (error) {
+    console.error("askGrok error", error);
+    return "Lỗi khi gửi câu hỏi đến Grok.";
   }
 }
 
@@ -55,7 +88,7 @@ const ChatboxGemini: React.FC = () => {
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setLoading(true);
-    const aiReply = await askGemini(userMsg.content);
+    const aiReply = await askGrok(userMsg.content);
     // Chèn xuống dòng trước mỗi dấu * hoặc ** để dễ nhìn hơn
     let formattedReply = aiReply.replace(/(\*\*?)/g, "\n$1");
     // Định dạng: **Tiêu đề:** => <strong>Tiêu đề:</strong>, * Bullet => <li>Bullet</li>
@@ -215,7 +248,7 @@ const ChatboxGemini: React.FC = () => {
                     handleSend();
                   }
                 }}
-                placeholder="Nhập câu hỏi cho Gemini..."
+                placeholder="Nhập câu hỏi cho Grok 4..."
                 autoSize={{ minRows: 1, maxRows: 4 }}
                 disabled={loading}
                 style={{ width: "calc(100% - 48px)", marginRight: 8 }}

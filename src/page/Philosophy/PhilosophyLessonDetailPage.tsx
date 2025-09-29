@@ -222,6 +222,7 @@ const PhilosophyLessonDetailPage: React.FC = () => {
               <Text strong>Thời gian làm bài</Text>
             </div>
             <Text>
+
               Bạn có <strong>5 phút</strong> để hoàn thành bài kiểm tra này. Hãy
               đọc kỹ từng câu hỏi và suy nghĩ cẩn thận trước khi chọn đáp án.
             </Text>
