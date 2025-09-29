@@ -37,6 +37,8 @@ interface FlashcardState {
   currentFlashcard: IFlashcard | null;
   detailLoading: boolean;
   detailError: string | null;
+  focusedList: IFlashcard[];
+  focusedIndex: number;
 }
 
 const initialState: FlashcardState = {
@@ -58,6 +60,8 @@ const initialState: FlashcardState = {
   currentFlashcard: null,
   detailLoading: false,
   detailError: null,
+  focusedList: [],
+  focusedIndex: 0,
 };
 
 const getErrorMessage = (error: unknown, fallback: string) => {
@@ -148,6 +152,32 @@ const flashcardSlice = createSlice({
       state.randomFlashcards = [];
       state.randomError = null;
     },
+    setFocusedFlashcards: (state, action: { payload: IFlashcard[] }) => {
+      state.focusedList = action.payload;
+      state.focusedIndex = 0;
+    },
+    goToNextFlashcard: (state) => {
+      const { focusedList, focusedIndex } = state;
+      if (!focusedList || focusedList.length === 0) return;
+      state.focusedIndex = Math.min(focusedIndex + 1, focusedList.length - 1);
+    },
+    goToPrevFlashcard: (state) => {
+      const { focusedList, focusedIndex } = state;
+      if (!focusedList || focusedList.length === 0) return;
+      state.focusedIndex = Math.max(focusedIndex - 1, 0);
+    },
+    setFocusedIndex: (state, action: { payload: number }) => {
+      const { focusedList } = state;
+      if (!focusedList || focusedList.length === 0) {
+        state.focusedIndex = 0;
+        return;
+      }
+      const nextIndex = Math.min(
+        Math.max(action.payload, 0),
+        focusedList.length - 1
+      );
+      state.focusedIndex = nextIndex;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -164,11 +194,15 @@ const flashcardSlice = createSlice({
           total: action.payload.data?.length || 0,
           totalPages: 1,
         };
+        state.focusedList = state.flashcards;
+        state.focusedIndex = 0;
       })
       .addCase(fetchFlashcards.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Không thể tải danh sách flashcard";
         state.flashcards = [];
+        state.focusedList = [];
+        state.focusedIndex = 0;
       })
       .addCase(fetchFlashcardTags.pending, (state) => {
         state.tagsLoading = true;
@@ -213,5 +247,12 @@ const flashcardSlice = createSlice({
   },
 });
 
-export const { resetFlashcardError, clearRandomFlashcards } = flashcardSlice.actions;
+export const {
+  resetFlashcardError,
+  clearRandomFlashcards,
+  setFocusedFlashcards,
+  goToNextFlashcard,
+  goToPrevFlashcard,
+  setFocusedIndex,
+} = flashcardSlice.actions;
 export default flashcardSlice.reducer;
