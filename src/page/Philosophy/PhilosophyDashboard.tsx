@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo } from "react";
 import {
   Card,
   Button,
@@ -30,9 +30,7 @@ import {
   getMarxistPhilosophyLearningPath,
   clearPhilosophyError,
   clearPhilosophySuccess,
-  getLatestContentPack,
 } from "@/services/features/marxist/philosophySlice";
-import ContentPackModal from "@/components/Modal/ContentPackModal";
 import { useNavigate } from "react-router-dom";
 
 const { Title, Text, Paragraph } = Typography;
@@ -56,19 +54,8 @@ const PhilosophyDashboard: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   // const { user } = useAppSelector((state: RootState) => state.auth);
-  const { loading, error, success, learningPath, contentPack } = useAppSelector(
+  const { loading, error, success, learningPath } = useAppSelector(
     (state: RootState) => state.philosophy
-  );
-
-  const [isContentModalOpen, setContentModalOpen] = useState(false);
-  const [isGeneratingFromContent, setGeneratingFromContent] = useState(false);
-  const [currentTopicForContent, setCurrentTopicForContent] = useState<{
-    topicId: string;
-    topicName: string;
-    level: string;
-  } | null>(null);
-  const [currentLessonPathId, setCurrentLessonPathId] = useState<string | null>(
-    null
   );
 
   // Type assertion for learningPath items
@@ -77,22 +64,6 @@ const PhilosophyDashboard: React.FC = () => {
   useEffect(() => {
     dispatch(getMarxistPhilosophyLearningPath({}));
   }, [dispatch]);
-
-  // Monitor contentPack changes (for manual ContentPack usage)
-  useEffect(() => {
-    if (contentPack && !isContentModalOpen) {
-      console.log("📚 ContentPack available for manual use");
-
-      // Set topic info for quiz generation if available
-      if (contentPack.topicId && contentPack.topicName) {
-        setCurrentTopicForContent({
-          topicId: contentPack.topicId,
-          topicName: contentPack.topicName,
-          level: contentPack.level || "intermediate",
-        });
-      }
-    }
-  }, [contentPack, isContentModalOpen]);
 
   const handleGenerateLesson = async (options = {}) => {
     try {
@@ -292,48 +263,6 @@ const PhilosophyDashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-yellow-50 p-6">
-      <ContentPackModal
-        open={isContentModalOpen}
-        loading={isGeneratingFromContent}
-        content={contentPack || undefined}
-        onClose={() => setContentModalOpen(false)}
-        onConfirmStudyDone={async () => {
-          try {
-            setGeneratingFromContent(true);
-            setContentModalOpen(false);
-
-            // Navigate to the specific lesson that user clicked
-            if (currentLessonPathId) {
-              console.log(
-                "📚 User finished studying, navigating to lesson:",
-                currentLessonPathId
-              );
-              window.location.href = `/philosophy-lesson/${currentLessonPathId}`;
-            } else {
-              // Fallback: find the current lesson to navigate to
-              const currentLesson = typedLearningPath.find(
-                (lesson) => !lesson.completed
-              );
-              if (currentLesson) {
-                console.log(
-                  "📚 Fallback: navigating to lesson:",
-                  currentLesson.pathId
-                );
-                window.location.href = `/philosophy-lesson/${currentLesson.pathId}`;
-              } else {
-                message.info("Không tìm thấy bài học hiện tại.");
-                dispatch(getMarxistPhilosophyLearningPath({}));
-              }
-            }
-
-            setGeneratingFromContent(false);
-          } catch (error) {
-            setGeneratingFromContent(false);
-            console.error("Error navigating to lesson:", error);
-            message.error("Không thể vào bài học.");
-          }
-        }}
-      />
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
@@ -551,48 +480,9 @@ const PhilosophyDashboard: React.FC = () => {
                               <Button
                                 type={isNewest ? "primary" : "default"}
                                 size="small"
-                                onClick={async () => {
-                                  try {
-                                    // Always fetch latest ContentPack from BE to ensure we have the most recent one
-                                    console.log(
-                                      "🔄 Fetching latest ContentPack from BE..."
-                                    );
-                                    const result = await dispatch(
-                                      getLatestContentPack()
-                                    ).unwrap();
-
-                                    console.log("📦 API Response:", result);
-
-                                    // Prefer using API response directly to decide modal
-                                    const cp = result?.contentPack;
-                                    console.log("🔍 ContentPack from API:", cp);
-
-                                    if (cp && (cp.topicName || cp.title)) {
-                                      setCurrentLessonPathId(item.pathId);
-                                      setContentModalOpen(true);
-                                      console.log(
-                                        "📚 Latest ContentPack fetched, showing modal for lesson:",
-                                        item.pathId
-                                      );
-                                    } else {
-                                      console.log(
-                                        "📚 No ContentPack available or missing fields, navigate directly to lesson",
-                                        {
-                                          exists: !!cp,
-                                          topicName: cp?.topicName,
-                                          title: cp?.title,
-                                        }
-                                      );
-                                      window.location.href = `/philosophy-lesson/${item.pathId}`;
-                                    }
-                                  } catch (error) {
-                                    console.error(
-                                      "❌ Failed to fetch latest ContentPack:",
-                                      error
-                                    );
-                                    // Fallback: navigate directly to lesson
-                                    window.location.href = `/philosophy-lesson/${item.pathId}`;
-                                  }
+                                onClick={() => {
+                                  // Navigate directly to lesson without ContentPack popup
+                                  window.location.href = `/philosophy-lesson/${item.pathId}`;
                                 }}
                                 className={
                                   isNewest
@@ -684,18 +574,8 @@ const PhilosophyDashboard: React.FC = () => {
                       icon={<BookOutlined />}
                       onClick={() => {
                         if (nextIncompleteLesson) {
-                          // Check if there's a ContentPack available for study
-                          if (contentPack && currentTopicForContent) {
-                            setCurrentLessonPathId(nextIncompleteLesson.pathId);
-                            setContentModalOpen(true);
-                            console.log(
-                              "📚 Showing ContentPack modal for study, lesson:",
-                              nextIncompleteLesson.pathId
-                            );
-                          } else {
-                            // Navigate directly to lesson if no ContentPack
-                            window.location.href = `/philosophy-lesson/${nextIncompleteLesson.pathId}`;
-                          }
+                          // Navigate directly to lesson without ContentPack popup
+                          window.location.href = `/philosophy-lesson/${nextIncompleteLesson.pathId}`;
                         }
                       }}
                       className="bg-blue-600 hover:bg-blue-700">
