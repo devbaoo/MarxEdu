@@ -6,17 +6,17 @@ import { Provider } from 'react-redux';
 import { store, persistor } from './services/store/store';
 import { PersistGate } from 'redux-persist/integration/react';
 import ChatboxGemini from '@/components/ui/ChatboxGemini';
-import React from 'react';
+
 
 const container = document.getElementById('root');
 const root = createRoot(container!);
 root.render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <App />
-        <ChatboxGemini />
-      </PersistGate>
-    </Provider>
-  </React.StrictMode>
+
+  <Provider store={store}>
+    <PersistGate loading={null} persistor={persistor}>
+      <App />
+      <ChatboxGemini />
+    </PersistGate>
+  </Provider>
+
 );
