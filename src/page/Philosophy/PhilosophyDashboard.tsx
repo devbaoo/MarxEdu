@@ -159,8 +159,96 @@ const PhilosophyDashboard: React.FC = () => {
       message.destroy(); // Clear loading message
 
       // Handle specific rate limiting, queue errors, and performance optimizations
-      const error = err as { statusCode?: number; message?: string };
-      if (error?.statusCode === 503) {
+      const error = err as {
+        statusCode?: number;
+        message?: string;
+        error?: string;
+        retryable?: boolean;
+        concentrationIssues?: {
+          distribution: { [key: string]: number };
+          issues: string[];
+          severity: "CRITICAL" | "HIGH" | "MEDIUM";
+        };
+      };
+
+      // 🚨 NEW: Handle validation errors from enhanced BE
+      if (error?.error === "ANSWER_CONCENTRATION_FAILED") {
+        console.error("🎯 Answer concentration validation failed:", {
+          error: error.error,
+          message: error.message,
+          concentrationIssues: error.concentrationIssues,
+          statusCode: error.statusCode,
+        });
+
+        const concentrationInfo = error.concentrationIssues;
+        const distributionText = concentrationInfo?.distribution
+          ? `A:${concentrationInfo.distribution.A || 0}, B:${
+              concentrationInfo.distribution.B || 0
+            }, C:${concentrationInfo.distribution.C || 0}, D:${
+              concentrationInfo.distribution.D || 0
+            }`
+          : "";
+
+        message.error({
+          content: (
+            <div>
+              <div>
+                🎯 <strong>AI Answer Distribution Issues Detected!</strong>
+              </div>
+              <div style={{ fontSize: "12px", marginTop: "4px" }}>
+                📊 Distribution: {distributionText}
+              </div>
+              <div style={{ fontSize: "12px" }}>
+                🚨 Issues:{" "}
+                {concentrationInfo?.issues?.join(", ") || "Poor answer balance"}
+              </div>
+              <div style={{ fontSize: "12px" }}>
+                🔄 Hệ thống đang auto-retry với AI khác...
+              </div>
+            </div>
+          ),
+          duration: 10,
+        });
+      } else if (error?.error === "AI_GENERATION_FAILED") {
+        console.error("🤖 All AI providers failed:", {
+          error: error.error,
+          message: error.message,
+          retryable: error.retryable,
+          statusCode: error.statusCode,
+        });
+
+        message.error({
+          content: (
+            <div>
+              <div>
+                🤖 <strong>All AI Providers Failed!</strong>
+              </div>
+              <div style={{ fontSize: "12px", marginTop: "4px" }}>
+                Gemini + Grok4 đều thất bại trong AI generation
+              </div>
+              <div style={{ fontSize: "12px" }}>
+                🔄 {error.retryable ? "Có thể thử lại" : "Vui lòng báo cáo lỗi"}
+              </div>
+              {error.retryable && (
+                <button
+                  onClick={() => handleGenerateLesson()}
+                  style={{
+                    marginTop: "8px",
+                    padding: "4px 8px",
+                    background: "#1890ff",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                  }}>
+                  🔄 Retry Generation
+                </button>
+              )}
+            </div>
+          ),
+          duration: 12,
+        });
+      } else if (error?.statusCode === 503) {
         // System overload or AI service unavailable
         message.error({
           content: `⚠️ Hệ thống đang quá tải. ${error.message || "Vui lòng thử lại sau giây lát."

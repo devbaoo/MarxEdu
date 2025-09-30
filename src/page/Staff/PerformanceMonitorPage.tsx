@@ -343,6 +343,83 @@ const PerformanceMonitorPage: React.FC = () => {
             </Col>
           </Row>
 
+          {/* 🚨 NEW: Answer Validation Monitoring */}
+          <Row gutter={[16, 16]} className="mb-6">
+            <Col span={24}>
+              <Card
+                title="🎯 Answer Validation & Distribution Quality"
+                className="mb-6">
+                {generationStats ? (
+                  <Row gutter={[16, 16]}>
+                    <Col xs={24} sm={8}>
+                      <Card size="small">
+                        <Statistic
+                          title="Valid Distributions"
+                          value={
+                            generationStats.stats.validation
+                              ?.validDistributions || 0
+                          }
+                          suffix={`/ ${
+                            generationStats.stats.validation?.totalValidated ||
+                            0
+                          }`}
+                          valueStyle={{
+                            color:
+                              (generationStats.stats.validation
+                                ?.validDistributions || 0) >
+                              (generationStats.stats.validation
+                                ?.totalValidated || 0) *
+                                0.8
+                                ? "#3f8600"
+                                : "#cf1322",
+                          }}
+                          prefix="✅"
+                        />
+                      </Card>
+                    </Col>
+                    <Col xs={24} sm={8}>
+                      <Card size="small">
+                        <Statistic
+                          title="Concentration Issues"
+                          value={
+                            generationStats.stats.validation
+                              ?.concentrationIssues || 0
+                          }
+                          valueStyle={{ color: "#cf1322" }}
+                          prefix="🚨"
+                        />
+                      </Card>
+                    </Col>
+                    <Col xs={24} sm={8}>
+                      <Card size="small">
+                        <Statistic
+                          title="Auto-Retries Success"
+                          value={
+                            generationStats.stats.validation?.retrySuccessRate
+                              ? `${generationStats.stats.validation.retrySuccessRate.toFixed(
+                                  1
+                                )}%`
+                              : "0%"
+                          }
+                          valueStyle={{
+                            color:
+                              (generationStats.stats.validation
+                                ?.retrySuccessRate || 0) > 70
+                                ? "#3f8600"
+                                : "#d46b08",
+                          }}
+                          prefix="🔄"
+                        />
+                      </Card>
+                    </Col>
+                  </Row>
+                ) : (
+                  <Text>No validation data available</Text>
+                )}
+              </Card>
+            </Col>
+          </Row>
+
           {/* AI Providers Table */}
           <Card title="🤖 Multi-AI Load Balancer" className="mt-6">
             {multiAiStats ? (
