@@ -21,6 +21,9 @@ import {
   UPDATE_MARXIST_PHILOSOPHY_TOPIC_ENDPOINT,
   DELETE_MARXIST_PHILOSOPHY_TOPIC_ENDPOINT,
   SEED_MARXIST_PHILOSOPHY_TOPICS_ENDPOINT,
+  GET_MARXIST_PHILOSOPHY_GENERATION_STATS_ENDPOINT,
+  GET_MARXIST_PHILOSOPHY_MULTI_AI_STATS_ENDPOINT,
+  GET_MARXIST_PHILOSOPHY_RATE_LIMITER_STATS_ENDPOINT,
 } from "@/services/constant/apiConfig";
 import {
   IMarxistPhilosophyTopic,
@@ -446,6 +449,37 @@ export const seedMarxistPhilosophyTopics = createAsyncThunk(
   async () => {
     const response = await axiosInstance.post(
       SEED_MARXIST_PHILOSOPHY_TOPICS_ENDPOINT
+    );
+    return response.data;
+  }
+);
+
+// ⚡ Performance Monitoring Async Thunks (Admin/Staff only)
+export const getGenerationStats = createAsyncThunk(
+  "philosophy/getGenerationStats",
+  async () => {
+    const response = await axiosInstance.get(
+      GET_MARXIST_PHILOSOPHY_GENERATION_STATS_ENDPOINT
+    );
+    return response.data;
+  }
+);
+
+export const getMultiAiStats = createAsyncThunk(
+  "philosophy/getMultiAiStats",
+  async () => {
+    const response = await axiosInstance.get(
+      GET_MARXIST_PHILOSOPHY_MULTI_AI_STATS_ENDPOINT
+    );
+    return response.data;
+  }
+);
+
+export const getRateLimiterStats = createAsyncThunk(
+  "philosophy/getRateLimiterStats",
+  async () => {
+    const response = await axiosInstance.get(
+      GET_MARXIST_PHILOSOPHY_RATE_LIMITER_STATS_ENDPOINT
     );
     return response.data;
   }

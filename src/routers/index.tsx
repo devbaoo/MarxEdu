@@ -47,6 +47,7 @@ import PhilosophyTopicsPage from "@/page/Staff/PhilosophyTopicsPage";
 import PhilosophyLessonsPage from "@/page/Staff/PhilosophyLessonsPage";
 import PhilosophyStatsPage from "@/page/Staff/PhilosophyStatsPage";
 import MultiAITestPage from "@/page/Staff/MultiAITestPage";
+import PerformanceMonitorPage from "@/page/Staff/PerformanceMonitorPage";
 import PhilosophyLessonDetailPage from "@/page/Philosophy/PhilosophyLessonDetailPage";
 import SurveyManagementPage from "@/page/Admin/SurveyManagementPage";
 import PhilosophyLessonTestPage from "@/page/Philosophy/PhilosophyLessonTestPage";
@@ -84,8 +85,7 @@ const AppRouter = () => {
           ) : (
             <Navigate to={getInitialRoute()} />
           )
-        }
-      >
+        }>
         <Route path="/" element={<HomePage />} />
         <Route path="/home" element={<HomePage />} />
       </Route>
@@ -98,8 +98,7 @@ const AppRouter = () => {
           ) : (
             <Navigate to={getInitialRoute()} />
           )
-        }
-      >
+        }>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<LoginPage isRegister={true} />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
@@ -196,6 +195,10 @@ const AppRouter = () => {
             element={<PhilosophyLessonsPage />}
           />
           <Route path="philosophy-stats" element={<PhilosophyStatsPage />} />
+          <Route
+            path="performance-monitor"
+            element={<PerformanceMonitorPage />}
+          />
           {/* Redirect old staff routes to new philosophy routes */}
           <Route
             path="marxist-topics"
