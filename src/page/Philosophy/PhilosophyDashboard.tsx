@@ -75,9 +75,9 @@ const PhilosophyDashboard: React.FC = () => {
         canGenerate: !hasIncompleteLesson,
       });
 
-      // Show loading message for Multi-AI system with JSON processing
+      // Show optimized loading message for performance improvements
       message.loading(
-        "Đang tạo bài học với Multi-AI System (Gemini + Grok4)... Đang xử lý và kiểm tra JSON...",
+        "🚀 Tạo bài học với AI System tối ưu (Queue Management + Batch Operations)... Vui lòng chờ trong giây lát...",
         0
       );
 
@@ -87,18 +87,22 @@ const PhilosophyDashboard: React.FC = () => {
       console.log("✅ Lesson generated successfully:", result);
       message.destroy(); // Clear loading message
 
-      // Show AI provider info if available
+      // Show enhanced AI provider info with performance metrics
       const aiProvider = result.provider || "Unknown AI";
       const loadBalancerInfo = result.loadBalancer;
+      const questionCount = result.lesson?.questionCount || 10;
 
-      let successMessage = `🎉 Bài học đã được tạo thành công bởi ${aiProvider}!`;
+      let successMessage = `🚀 Bài học tạo thành công với ${questionCount} câu hỏi (AI: ${aiProvider})!`;
       if (loadBalancerInfo) {
-        successMessage += ` (${loadBalancerInfo.strategy} strategy, attempt ${loadBalancerInfo.providerAttempt})`;
+        successMessage += ` ⚡ Optimized: ${loadBalancerInfo.strategy} strategy`;
+        if (loadBalancerInfo.providerAttempt) {
+          successMessage += `, attempt ${loadBalancerInfo.providerAttempt}`;
+        }
       }
 
       message.success({
         content: successMessage,
-        duration: 6,
+        duration: 8, // Longer duration để user có thể đọc performance info
       });
 
       // Simplified flow: Just navigate to lesson after successful generation
@@ -154,43 +158,65 @@ const PhilosophyDashboard: React.FC = () => {
       console.error("❌ Error generating lesson:", err);
       message.destroy(); // Clear loading message
 
-      // Handle specific rate limiting and queue errors
+      // Handle specific rate limiting, queue errors, and performance optimizations
       const error = err as { statusCode?: number; message?: string };
       if (error?.statusCode === 503) {
-        // System overload
+        // System overload or AI service unavailable
         message.error({
-          content: `⚠️ ${error.message}`,
-          duration: 5,
-        });
-      } else if (error?.statusCode === 429) {
-        // User already generating or system is auto-generating
-        message.warning({
-          content: `⏳ ${error.message}`,
+          content: `⚠️ Hệ thống đang quá tải. ${
+            error.message || "Vui lòng thử lại sau giây lát."
+          }`,
           duration: 6,
         });
+      } else if (error?.statusCode === 429) {
+        // Queue is full or rate limited
+        message.warning({
+          content: `⏳ Hệ thống đang bận (Queue Management). ${
+            error.message || "Vui lòng chờ và thử lại..."
+          }`,
+          duration: 8,
+        });
       } else if (error?.statusCode === 408) {
-        // Timeout
+        // Timeout - performance optimization kicked in
         message.error({
-          content: `⏱️ ${error.message}`,
+          content: `⏱️ Timeout: ${
+            error.message || "AI generation mất quá nhiều thời gian. Thử lại!"
+          }`,
           duration: 5,
+        });
+      } else if (error?.message?.includes("queue")) {
+        // AI Generation Queue specific errors
+        message.warning({
+          content:
+            "🚀 Hệ thống AI đang xử lý nhiều yêu cầu. Queue Management đang tối ưu, vui lòng thử lại!",
+          duration: 7,
+        });
+      } else if (error?.message?.includes("concurrent")) {
+        // Concurrent limit reached
+        message.info({
+          content:
+            "⚡ Đã đạt giới hạn concurrent generations. Performance optimization đang hoạt động, thử lại sau!",
+          duration: 6,
         });
       } else if (error?.message?.includes("JSON")) {
         // JSON parsing errors from Grok4
         message.error({
           content:
-            "Lỗi xử lý dữ liệu từ AI. Hệ thống đang tự động sửa chữa và thử lại...",
+            "Lỗi xử lý dữ liệu từ AI. Batch Operations đang tự động sửa chữa và thử lại...",
           duration: 6,
         });
       } else if (error?.message?.includes("repair")) {
         // JSON repair errors
         message.warning({
-          content: "AI đang tối ưu hóa dữ liệu. Vui lòng thử lại sau giây lát.",
+          content:
+            "AI đang tối ưu hóa dữ liệu với Parallel Processing. Vui lòng thử lại sau giây lát.",
           duration: 5,
         });
       } else {
         // Generic error
         message.error({
-          content: "Có lỗi xảy ra khi tạo bài học. Vui lòng thử lại.",
+          content:
+            "Có lỗi xảy ra trong AI Generation System. Vui lòng thử lại.",
           duration: 4,
         });
       }

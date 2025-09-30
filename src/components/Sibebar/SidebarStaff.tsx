@@ -1,19 +1,19 @@
-import { useState } from 'react';
-import { Layout, Menu, Button } from 'antd';
+import { useState } from "react";
+import { Layout, Menu, Button } from "antd";
 import {
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   BookOutlined,
-
   DashboardOutlined,
   ExperimentOutlined,
   BarChartOutlined,
-  ReadOutlined
-} from '@ant-design/icons';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { logout } from '@/services/features/auth/authSlice';
+  ReadOutlined,
+  ThunderboltOutlined,
+} from "@ant-design/icons";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { logout } from "@/services/features/auth/authSlice";
 
 const { Sider } = Layout;
 
@@ -26,7 +26,7 @@ const SidebarStaff = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate('/login');
+    navigate("/login");
   };
 
   const getSelectedKeys = () => [location.pathname];
@@ -43,7 +43,7 @@ const SidebarStaff = () => {
       path: "/staff",
     },
     {
-      key: "marxist-topics", 
+      key: "marxist-topics",
       icon: <BookOutlined />,
       label: "Chủ đề Marxist",
       path: "/staff/marxist-topics",
@@ -51,7 +51,7 @@ const SidebarStaff = () => {
     {
       key: "marxist-lessons",
       icon: <ReadOutlined />,
-      label: "Bài học Marxist", 
+      label: "Bài học Marxist",
       path: "/staff/marxist-lessons",
     },
     {
@@ -66,6 +66,12 @@ const SidebarStaff = () => {
       label: "Gemini AI Test",
       path: "/staff/gemini-test",
     },
+    {
+      key: "performance-monitor",
+      icon: <ThunderboltOutlined />,
+      label: "⚡ Performance Monitor",
+      path: "/staff/performance-monitor",
+    },
   ];
 
   return (
@@ -77,37 +83,41 @@ const SidebarStaff = () => {
       width={240}
       className="shadow relative"
       style={{
-        background: 'linear-gradient(to bottom, #dc2626, #991b1b)',
-        color: 'white',
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100vh',
-      }}
-    >
+        background: "linear-gradient(to bottom, #dc2626, #991b1b)",
+        color: "white",
+        display: "flex",
+        flexDirection: "column",
+        height: "100vh",
+      }}>
       {/* Top: Toggle + Logo */}
       <div
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          padding: '16px 20px',
+          display: "flex",
+          alignItems: "center",
+          padding: "16px 20px",
           gap: 12,
-        }}
-      >
+        }}>
         <Button
           type="text"
           icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
           onClick={() => setCollapsed(!collapsed)}
-          style={{ color: 'white', fontSize: 18 }}
+          style={{ color: "white", fontSize: 18 }}
         />
         {!collapsed && (
-          <div style={{ fontSize: 20, fontWeight: 'bold', color: 'white', fontFamily: "'Baloo 2', cursive" }}>
+          <div
+            style={{
+              fontSize: 20,
+              fontWeight: "bold",
+              color: "white",
+              fontFamily: "'Baloo 2', cursive",
+            }}>
             🚩 MarxEdu Staff
           </div>
         )}
       </div>
 
       {/* Middle: Menu */}
-      <div style={{ flex: 1, overflowY: 'auto' }}>
+      <div style={{ flex: 1, overflowY: "auto" }}>
         <Menu
           mode="inline"
           selectedKeys={getSelectedKeys()}
@@ -115,11 +125,10 @@ const SidebarStaff = () => {
           onOpenChange={(keys) => setOpenKeys(keys)}
           theme="light"
           style={{
-            background: 'transparent',
-            border: 'none',
-            fontFamily: "'Baloo 2', cursive"
-          }}
-        >
+            background: "transparent",
+            border: "none",
+            fontFamily: "'Baloo 2', cursive",
+          }}>
           {menuItems.map((item) => (
             <Menu.Item key={item.key} icon={item.icon}>
               <Link to={item.path}>{item.label}</Link>
@@ -131,18 +140,20 @@ const SidebarStaff = () => {
       {/* Bottom: Logout */}
       <div
         style={{
-          padding: '16px',
-          borderTop: '1px solid rgba(255,255,255,0.1)',
-          textAlign: 'center',
-        }}
-      >
+          padding: "16px",
+          borderTop: "1px solid rgba(255,255,255,0.1)",
+          textAlign: "center",
+        }}>
         <Button
           type="text"
           icon={<LogoutOutlined />}
           onClick={handleLogout}
-          style={{ color: 'black', fontSize: 16, fontFamily: "'Baloo 2', cursive" }}
-        >
-          {!collapsed && 'Logout'}
+          style={{
+            color: "black",
+            fontSize: 16,
+            fontFamily: "'Baloo 2', cursive",
+          }}>
+          {!collapsed && "Logout"}
         </Button>
       </div>
     </Sider>

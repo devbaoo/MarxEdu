@@ -93,19 +93,19 @@ export interface IMarxistPhilosophyLearningPath {
 
 // Learning path response interface
 export interface IMarxistPhilosophyLearningPathResponse {
-    success: boolean;
-    statusCode: number;
-    message: string;
-    learningPath: IMarxistLearningPath[];
-    pagination: {
-        currentPage: number;
-        totalPages: number;
-        totalItems: number;
-        pageSize: number;
-    };
-    // New field for first-time users
-    needsFirstLesson?: boolean;
-    availableTopics?: number;
+  success: boolean;
+  statusCode: number;
+  message: string;
+  learningPath: IMarxistLearningPath[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    pageSize: number;
+  };
+  // New field for first-time users
+  needsFirstLesson?: boolean;
+  availableTopics?: number;
 }
 
 // Marxist Philosophy Lesson Generation Interfaces
@@ -180,43 +180,43 @@ export interface IMarxistPhilosophyProgressAnalysisResponse {
 
 // Complete Lesson Interfaces
 export interface ICompleteMarxistPhilosophyLessonData {
-    lessonId: string;
+  lessonId: string;
+  score: number;
+  questionResults?: Array<{
+    questionId: string;
+    answer: string; // Backend expects 'answer', not 'userAnswer'
+    isCorrect: boolean;
     score: number;
-    questionResults?: Array<{
-        questionId: string;
-        answer: string; // Backend expects 'answer', not 'userAnswer'
-        isCorrect: boolean;
-        score: number;
-        isTimeout?: boolean;
-        transcription?: string | null;
-        feedback?: string | null;
-    }>;
+    isTimeout?: boolean;
+    transcription?: string | null;
+    feedback?: string | null;
+  }>;
 }
 
 // Complete lesson response interface
 export interface ICompleteMarxistPhilosophyLessonResponse {
-    success: boolean;
-    statusCode: number;
-    message: string;
-    pathUpdated: boolean;
-    completed: boolean;
-    nextLessonGenerated: boolean;
-    // Lives system
-    livesDeducted: boolean;
-    currentLives: number;
-    // Score info
-    scoreAchieved: number;
-    passed: boolean;
-    // XP & Level system
-    earnedXP: number;
-    leveledUp: boolean;
-    newLevel: number;
-    livesFromLevelUp: number;
-    currentXP: number;
-    nextLevelRequiredXP: number;
-    // Progress system (NEW)
-    progressId: string;
-    progressStatus: 'COMPLETE' | 'FAILED';
+  success: boolean;
+  statusCode: number;
+  message: string;
+  pathUpdated: boolean;
+  completed: boolean;
+  nextLessonGenerated: boolean;
+  // Lives system
+  livesDeducted: boolean;
+  currentLives: number;
+  // Score info
+  scoreAchieved: number;
+  passed: boolean;
+  // XP & Level system
+  earnedXP: number;
+  leveledUp: boolean;
+  newLevel: number;
+  livesFromLevelUp: number;
+  currentXP: number;
+  nextLevelRequiredXP: number;
+  // Progress system (NEW)
+  progressId: string;
+  progressStatus: "COMPLETE" | "FAILED";
 }
 
 // Multi-AI Connection Test Interfaces
@@ -298,9 +298,25 @@ export interface IGeminiConnectionResponse {
   success: boolean;
   message: string;
   connected: boolean;
-} 
+}
 
 // ========= Pre-study Content Pack =========
+// Recursive type for mindmap nodes
+interface IMindmapNode {
+  id: string;
+  label: string;
+  children?: IMindmapNode[];
+}
+
+// Source interface for content references
+interface IContentSource {
+  title: string;
+  url?: string;
+  author?: string;
+  type?: "book" | "article" | "video" | "website" | "document";
+  description?: string;
+}
+
 export interface IContentPack {
   title: string;
   topicId?: string;
@@ -309,21 +325,17 @@ export interface IContentPack {
   goal?: string;
   summary?: string;
   keyPoints?: string[];
-  mindmapNodes?: Array<{
-    id: string;
-    label: string;
-    children?: Array<{ id: string; label: string; children?: Array<any> }>;
-  }>;
+  mindmapNodes?: IMindmapNode[];
   flashcards?: Array<{
     term: string;
     definition: string;
     example?: string;
     tags?: string[];
-    difficulty?: 'easy' | 'medium' | 'hard';
+    difficulty?: "easy" | "medium" | "hard";
   }>;
   slideOutline?: string[];
   readingTime?: number;
-  sources?: Array<any>;
+  sources?: IContentSource[];
 }
 
 export interface IGenerateContentPackPayload {
@@ -351,4 +363,60 @@ export interface IGenerateLessonFromContentPayload {
   level?: string;
   goal?: string;
   questionCount?: number; // default 10
+}
+
+// ⚡ Performance Monitoring Interfaces
+export interface IGenerationStats {
+  success: boolean;
+  message: string;
+  stats: {
+    queue: {
+      currentRunning: number;
+      queueLength: number;
+      maxConcurrent: number;
+      totalProcessed: number;
+      totalFailed: number;
+      avgProcessingTime: number;
+    };
+    rateLimiter: {
+      concurrent: number;
+      queued: number;
+      lastReset: string;
+    };
+    performance: {
+      avgGenerationTime: number;
+      totalGenerations: number;
+      successRate: number;
+    };
+  };
+}
+
+export interface IMultiAiStats {
+  success: boolean;
+  message: string;
+  stats: {
+    providers: Array<{
+      name: string;
+      priority: number;
+      weight: number;
+      maxConcurrent: number;
+      currentLoad: number;
+      failures: number;
+      lastUsed: number;
+    }>;
+    timestamp: number;
+  };
+}
+
+export interface IRateLimiterStats {
+  success: boolean;
+  message: string;
+  stats: {
+    concurrent: number;
+    queued: number;
+    processed: number;
+    failed: number;
+    lastReset: string;
+    memoryUsage: number;
+  };
 }

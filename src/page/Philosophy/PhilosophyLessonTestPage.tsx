@@ -12,7 +12,6 @@ import {
   Radio,
   Progress,
   Modal,
-  message,
 } from "antd";
 import {
   ClockCircleOutlined,
@@ -171,7 +170,7 @@ const PhilosophyLessonTestPage: React.FC = () => {
     } finally {
       setLessonLoading(false);
     }
-  }, [pathId, dispatch]);
+  }, [pathId, dispatch, navigate]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -409,78 +408,16 @@ const PhilosophyLessonTestPage: React.FC = () => {
           </div>
         ),
         onOk: async () => {
-          if (result.passed) {
-            // Hiển thị loading message khi AI đang tạo ContentPack + quiz
-            message.loading({
-              content:
-                "🤖 Multi-AI đang tạo: (1) Học liệu ôn tập + (2) Bài quiz 10 câu... Vui lòng chờ...",
-              duration: 0, // Không tự động tắt
-              key: "ai-generation-loading",
-            });
-
-            console.log(
-              "✅ Lesson completed successfully. AI is generating ContentPack + quiz in background..."
-            );
-
-            // Progressive loading messages để user biết AI đang làm gì
-            setTimeout(() => {
-              message.loading({
-                content:
-                  "🧠 Đang tạo học liệu ôn tập (tóm tắt, mindmap, flashcards)...",
-                duration: 0,
-                key: "ai-generation-loading",
-              });
-            }, 3000);
-
-            setTimeout(() => {
-              message.loading({
-                content:
-                  "📝 Đang tạo bài quiz 10 câu dựa trên học liệu vừa tạo...",
-                duration: 0,
-                key: "ai-generation-loading",
-              });
-            }, 7000);
-
-            // Chờ một chút để AI có thời gian tạo ContentPack + quiz
-            setTimeout(async () => {
-              try {
-                // 🔄 Refresh learning path để lấy dữ liệu mới
-                await dispatch(getMarxistPhilosophyLearningPath({})).unwrap();
-                console.log("✅ Learning path refreshed successfully");
-
-                // Tắt loading message
-                message.destroy("ai-generation-loading");
-
-                // Hiển thị thông báo thành công
-                message.success({
-                  content:
-                    "🎉 Multi-AI đã hoàn thành: Học liệu ôn tập + Bài quiz 10 câu!",
-                  duration: 4,
-                });
-
-                // Navigate về dashboard
-                navigate("/philosophy");
-              } catch (refreshError) {
-                console.warn(
-                  "⚠️ Failed to refresh learning path:",
-                  refreshError
-                );
-                message.destroy("ai-generation-loading");
-                message.error("Lỗi khi tải dữ liệu mới");
-                navigate("/philosophy");
-              }
-            }, 20000); // Chờ 20 giây để AI tạo xong ContentPack + review quiz
-          } else {
-            // Nếu không pass, chỉ refresh và navigate bình thường
-            try {
-              await dispatch(getMarxistPhilosophyLearningPath({})).unwrap();
-              console.log("✅ Learning path refreshed after failed attempt");
-            } catch (refreshError) {
-              console.warn("⚠️ Failed to refresh learning path:", refreshError);
-            }
-
-            navigate("/philosophy");
+          // Refresh learning path để cập nhật trạng thái mới
+          try {
+            await dispatch(getMarxistPhilosophyLearningPath({})).unwrap();
+            console.log("✅ Learning path refreshed successfully");
+          } catch (refreshError) {
+            console.warn("⚠️ Failed to refresh learning path:", refreshError);
           }
+
+          // Navigate về dashboard ngay lập tức
+          navigate("/philosophy");
         },
       });
 
@@ -517,7 +454,7 @@ const PhilosophyLessonTestPage: React.FC = () => {
         onOk: () => navigate("/philosophy"),
       });
     }
-  }, [lesson, answers, navigate, dispatch]);
+  }, [lesson, answers, navigate, dispatch, pathId]);
 
   // Auto-submit when time runs out
   useEffect(() => {
@@ -641,8 +578,7 @@ const PhilosophyLessonTestPage: React.FC = () => {
           />
           <Button
             icon={<ArrowLeftOutlined />}
-            onClick={() => navigate("/philosophy")}
-          >
+            onClick={() => navigate("/philosophy")}>
             Quay lại trang chủ
           </Button>
         </div>
@@ -709,8 +645,7 @@ const PhilosophyLessonTestPage: React.FC = () => {
               size="large"
               icon={<CheckCircleOutlined />}
               onClick={startTest}
-              className="bg-red-600 hover:bg-red-700 px-8 py-2 h-auto text-lg"
-            >
+              className="bg-red-600 hover:bg-red-700 px-8 py-2 h-auto text-lg">
               {isRetry ? "🔄 Bắt đầu làm lại" : "🚀 Bắt đầu kiểm tra"}
             </Button>
           </Card>
@@ -735,8 +670,7 @@ const PhilosophyLessonTestPage: React.FC = () => {
                 <span
                   className={`text-xl font-bold ${
                     timeLeft < 300 ? "text-red-600" : "text-green-600"
-                  }`}
-                >
+                  }`}>
                   {formatTime(timeLeft)}
                 </span>
               </div>
@@ -795,8 +729,7 @@ const PhilosophyLessonTestPage: React.FC = () => {
               onChange={(e) =>
                 handleAnswerChange(currentQuestionData._id, e.target.value)
               }
-              className="w-full"
-            >
+              className="w-full">
               <div className="space-y-3">
                 {currentQuestionData.options?.map((option, index) => (
                   <Radio key={index} value={option} className="w-full">
@@ -817,8 +750,7 @@ const PhilosophyLessonTestPage: React.FC = () => {
               <Button
                 icon={<ArrowLeftOutlined />}
                 disabled={currentQuestion === 0}
-                onClick={() => setCurrentQuestion(currentQuestion - 1)}
-              >
+                onClick={() => setCurrentQuestion(currentQuestion - 1)}>
                 Câu trước
               </Button>
             </Col>
@@ -828,8 +760,7 @@ const PhilosophyLessonTestPage: React.FC = () => {
                 danger
                 icon={<SendOutlined />}
                 onClick={handleSubmitConfirm}
-                className="mx-2"
-              >
+                className="mx-2">
                 Nộp bài
               </Button>
             </Col>
@@ -839,8 +770,7 @@ const PhilosophyLessonTestPage: React.FC = () => {
                 disabled={
                   currentQuestion === (lesson.questions?.length || 1) - 1
                 }
-                onClick={() => setCurrentQuestion(currentQuestion + 1)}
-              >
+                onClick={() => setCurrentQuestion(currentQuestion + 1)}>
                 Câu sau
               </Button>
             </Col>
