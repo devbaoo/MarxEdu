@@ -136,7 +136,7 @@ const PhilosophyDashboard: React.FC = () => {
         ) {
           const newestLesson =
             learningPathResult.learningPath[
-              learningPathResult.learningPath.length - 1
+            learningPathResult.learningPath.length - 1
             ];
           console.log("🎯 Found newest lesson:", newestLesson);
 
@@ -163,25 +163,22 @@ const PhilosophyDashboard: React.FC = () => {
       if (error?.statusCode === 503) {
         // System overload or AI service unavailable
         message.error({
-          content: `⚠️ Hệ thống đang quá tải. ${
-            error.message || "Vui lòng thử lại sau giây lát."
-          }`,
+          content: `⚠️ Hệ thống đang quá tải. ${error.message || "Vui lòng thử lại sau giây lát."
+            }`,
           duration: 6,
         });
       } else if (error?.statusCode === 429) {
         // Queue is full or rate limited
         message.warning({
-          content: `⏳ Hệ thống đang bận (Queue Management). ${
-            error.message || "Vui lòng chờ và thử lại..."
-          }`,
+          content: `⏳ Hệ thống đang bận (Queue Management). ${error.message || "Vui lòng chờ và thử lại..."
+            }`,
           duration: 8,
         });
       } else if (error?.statusCode === 408) {
         // Timeout - performance optimization kicked in
         message.error({
-          content: `⏱️ Timeout: ${
-            error.message || "AI generation mất quá nhiều thời gian. Thử lại!"
-          }`,
+          content: `⏱️ Timeout: ${error.message || "AI generation mất quá nhiều thời gian. Thử lại!"
+            }`,
           duration: 5,
         });
       } else if (error?.message?.includes("queue")) {
@@ -261,7 +258,7 @@ const PhilosophyDashboard: React.FC = () => {
       case 5:
         return "Rất khó";
       default:
-        return "Không xác định";
+        return "📚";
     }
   };
 
@@ -327,16 +324,16 @@ const PhilosophyDashboard: React.FC = () => {
                   error.includes("generation failed") ||
                   error.includes("JSON") ||
                   error.includes("timeout")) && (
-                  <Button
-                    type="primary"
-                    size="small"
-                    icon={<ReloadOutlined />}
-                    onClick={() => handleGenerateLesson()}
-                    loading={loading}
-                    className="mt-2 bg-red-600 hover:bg-red-700">
-                    🔄 Thử lại với AI
-                  </Button>
-                )}
+                    <Button
+                      type="primary"
+                      size="small"
+                      icon={<ReloadOutlined />}
+                      onClick={() => handleGenerateLesson()}
+                      loading={loading}
+                      className="mt-2 bg-red-600 hover:bg-red-700">
+                      🔄 Thử lại với AI
+                    </Button>
+                  )}
               </div>
             }
             type="error"
@@ -423,20 +420,18 @@ const PhilosophyDashboard: React.FC = () => {
                       <Card
                         key={item.pathId}
                         size="small"
-                        className={`border-l-4 ${
-                          item.completed
+                        className={`border-l-4 ${item.completed
                             ? "border-l-green-500 bg-green-50"
                             : isNewest
-                            ? "border-l-blue-500 bg-blue-50"
-                            : "border-l-gray-300 bg-gray-50"
-                        } hover:shadow-md transition-all`}>
+                              ? "border-l-blue-500 bg-blue-50"
+                              : "border-l-gray-300 bg-gray-50"
+                          } hover:shadow-md transition-all`}>
                         <div className="flex justify-between items-start">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
                               <span
-                                className={`text-lg ${
-                                  item.completed ? "🎉" : isNewest ? "🚀" : "📚"
-                                }`}>
+                                className={`text-lg ${item.completed ? "🎉" : isNewest ? "🚀" : "📚"
+                                  }`}>
                                 {item.completed ? "🎉" : isNewest ? "🚀" : "📚"}
                               </span>
                               <Title level={5} className="mb-0">

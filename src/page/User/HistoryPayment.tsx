@@ -97,7 +97,7 @@ const HistoryPaymentPage: React.FC = () => {
           case "pending":
             return <Tag color="blue">Đang xử lý</Tag>;
           default:
-            return <Tag color="gray">Không xác định</Tag>;
+            return <Tag color="gray">📚</Tag>;
         }
       },
     },
@@ -164,7 +164,7 @@ const HistoryPaymentPage: React.FC = () => {
                   ? "Thất bại"
                   : selected.paymentStatus === "pending"
                     ? "Đang xử lý"
-                    : "Không xác định"}
+                    : "📚"}
             </Descriptions.Item>
             <Descriptions.Item label="Phương thức">
               {selected.paymentMethod}
