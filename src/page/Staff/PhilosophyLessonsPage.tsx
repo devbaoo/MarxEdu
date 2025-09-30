@@ -68,6 +68,17 @@ const PhilosophyLessonsPage: React.FC = () => {
     }
   };
 
+  const formatTopicTitle = (title?: string) => {
+    const normalizedTitle = title?.trim();
+    if (!normalizedTitle) {
+      return "Triết học";
+    }
+    if (normalizedTitle === "Không xác định") {
+      return "📚";
+    }
+    return normalizedTitle;
+  };
+
   const columns = [
     {
       title: "Tiêu đề bài học",
@@ -86,8 +97,10 @@ const PhilosophyLessonsPage: React.FC = () => {
       render: (_: unknown, record: IMarxistPhilosophyLearningPath) => (
         <div>
           <div className="font-medium">
-            {(record as { marxistTopic?: { title?: string } }).marxistTopic
-              ?.title || "Triết học"}
+            {formatTopicTitle(
+              (record as { marxistTopic?: { title?: string } }).marxistTopic
+                ?.title
+            )}
           </div>
           <div className="text-sm text-gray-500">
             {(record as { marxistTopic?: { name?: string } }).marxistTopic
