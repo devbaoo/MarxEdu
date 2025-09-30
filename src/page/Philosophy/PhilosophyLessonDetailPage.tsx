@@ -86,7 +86,7 @@ const PhilosophyLessonDetailPage: React.FC = () => {
       case 5:
         return "Rất khó";
       default:
-        return "Không xác định";
+        return "📚";
     }
   };
 
