@@ -262,6 +262,18 @@ const PhilosophyDashboard: React.FC = () => {
     }
   };
 
+  const formatTopicDisplay = (title?: string, name?: string) => {
+    const normalizedTitle = title?.trim();
+    if (!normalizedTitle || normalizedTitle === "Không xác định") {
+      const normalizedName = name?.trim();
+      if (normalizedName && normalizedName.toLowerCase() !== "unknown") {
+        return normalizedName;
+      }
+      return "📚";
+    }
+    return normalizedTitle;
+  };
+
   // Check if error is related to missing topics
   const isTopicError =
     error &&
@@ -452,8 +464,10 @@ const PhilosophyDashboard: React.FC = () => {
                                 {getDifficultyText(item.difficultyLevel)}
                               </Tag>
                               <Tag color="purple">
-                                {item.marxistTopic?.title ||
-                                  item.marxistTopic?.name}
+                                {formatTopicDisplay(
+                                  item.marxistTopic?.title,
+                                  item.marxistTopic?.name
+                                )}
                               </Tag>
                               <Tag color="orange">Bài {item.order}</Tag>
                               {item.completed && item.achievedScore && (
