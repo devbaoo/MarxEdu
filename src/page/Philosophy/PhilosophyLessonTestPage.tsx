@@ -392,19 +392,6 @@ const PhilosophyLessonTestPage: React.FC = () => {
                 </div>
               </div>
             )}
-
-            {/* Auto-generation info for passed tests */}
-            {result.passed && (
-              <div className="bg-green-50 p-3 rounded-lg border border-green-200">
-                <div className="text-green-800 font-semibold">
-                  🤖 Đang tự động tạo bài học tiếp theo...
-                </div>
-                <div className="text-green-700 text-sm">
-                  Hệ thống AI sẽ phân tích kết quả và tạo bài học phù hợp với
-                  trình độ của bạn.
-                </div>
-              </div>
-            )}
           </div>
         ),
         onOk: async () => {
