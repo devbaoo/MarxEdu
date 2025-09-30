@@ -137,6 +137,14 @@ export interface IGenerateMarxistPhilosophyLessonResponse {
     };
     recommendedReason: string;
   };
+  // 🚨 NEW: Enhanced validation error details
+  error?: string; // "ANSWER_CONCENTRATION_FAILED" | "AI_GENERATION_FAILED"
+  retryable?: boolean;
+  concentrationIssues?: {
+    distribution: { [key: string]: number };
+    issues: string[];
+    severity: "CRITICAL" | "HIGH" | "MEDIUM";
+  };
 }
 
 // Marxist Philosophy Statistics Interfaces
@@ -387,6 +395,14 @@ export interface IGenerationStats {
       avgGenerationTime: number;
       totalGenerations: number;
       successRate: number;
+    };
+    // 🚨 NEW: Answer validation monitoring
+    validation?: {
+      totalValidated: number;
+      validDistributions: number;
+      concentrationIssues: number;
+      retrySuccessRate: number;
+      commonIssues: string[];
     };
   };
 }

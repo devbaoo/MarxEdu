@@ -117,6 +117,28 @@ export const generateMarxistPhilosophyLesson = createAsyncThunk(
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         const errorData = error.response?.data;
+
+        // Handle specific validation errors from enhanced BE
+        if (errorData?.error === "ANSWER_CONCENTRATION_FAILED") {
+          return rejectWithValue({
+            statusCode: errorData.statusCode || 400,
+            message:
+              errorData.message || "AI generated poor answer distribution",
+            error: "ANSWER_CONCENTRATION_FAILED",
+            concentrationIssues: errorData.concentrationIssues,
+            retryable: errorData.retryable || true,
+          });
+        }
+
+        if (errorData?.error === "AI_GENERATION_FAILED") {
+          return rejectWithValue({
+            statusCode: errorData.statusCode || 503,
+            message: errorData.message || "All AI providers failed",
+            error: "AI_GENERATION_FAILED",
+            retryable: errorData.retryable || true,
+          });
+        }
+
         if (errorData?.statusCode === 429) {
           // Background generation in progress
           return rejectWithValue({
@@ -126,10 +148,13 @@ export const generateMarxistPhilosophyLesson = createAsyncThunk(
               "Hệ thống đang tạo bài học tự động, vui lòng chờ...",
           });
         }
+
         return rejectWithValue({
           statusCode: error.response?.status || 500,
           message:
             errorData?.message || error.message || "Failed to generate lesson",
+          error: errorData?.error,
+          retryable: errorData?.retryable,
         });
       }
       return rejectWithValue({
