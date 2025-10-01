@@ -48,6 +48,26 @@ export interface IMarxistPhilosophyTopicsResponse {
   };
 }
 
+export interface IMarxistPhilosophyTopicOption {
+  key: string;
+  title: string;
+  chapter: number;
+}
+
+export interface IMarxistPhilosophyTopicGroup {
+  title: string;
+  topics: IMarxistPhilosophyTopicOption[];
+}
+
+export interface IMarxistPhilosophyAvailableTopicsResponse {
+  success: boolean;
+  data: {
+    totalTopics: number;
+    topics: IMarxistPhilosophyTopicOption[];
+    groupedTopics: Record<string, IMarxistPhilosophyTopicGroup>;
+  };
+}
+
 // Marxist Philosophy Learning Path Interfaces
 export interface IMarxistLearningPath {
   pathId: string;
@@ -59,6 +79,8 @@ export interface IMarxistLearningPath {
     title: string;
     description: string;
   };
+  topicKey?: string;
+  customTopic?: string;
   difficultyLevel: number;
   recommendedReason: string;
   previousScore: number;
@@ -80,6 +102,8 @@ export interface IMarxistPhilosophyLearningPath {
     title: string;
     description: string;
   };
+  topicKey?: string;
+  customTopic?: string;
   difficultyLevel: number;
   recommendedReason: string;
   previousScore: number;
@@ -111,6 +135,8 @@ export interface IMarxistPhilosophyLearningPathResponse {
 // Marxist Philosophy Lesson Generation Interfaces
 export interface IGenerateMarxistPhilosophyLessonOptions {
   topic?: string;
+  topicKey?: string;
+  customTopic?: string;
   difficulty?: number;
 }
 
@@ -122,6 +148,8 @@ export interface IGenerateMarxistPhilosophyLessonResponse {
     lessonId: string;
     title: string;
     topic: string;
+    topicKey?: string;
+    customTopic?: string;
     difficultyLevel: number;
     questionCount: number;
     maxScore: number;
@@ -135,6 +163,8 @@ export interface IGenerateMarxistPhilosophyLessonResponse {
       name: string;
       title: string;
     };
+    topicKey?: string;
+    customTopic?: string;
     recommendedReason: string;
   };
   // 🚨 NEW: Enhanced validation error details
@@ -145,6 +175,8 @@ export interface IGenerateMarxistPhilosophyLessonResponse {
     issues: string[];
     severity: "CRITICAL" | "HIGH" | "MEDIUM";
   };
+  provider?: string;
+  loadBalancer?: ILoadBalancerInfo;
 }
 
 // Marxist Philosophy Statistics Interfaces
@@ -270,35 +302,6 @@ export interface ILoadBalancerInfo {
   attemptedProviders?: string[];
   totalAttempts?: number;
   failureCounts?: Record<string, number>;
-}
-
-// Enhanced Generation Response with Load Balancer Info
-export interface IGenerateMarxistPhilosophyLessonResponse {
-  success: boolean;
-  statusCode: number;
-  message: string;
-  lesson?: {
-    lessonId: string;
-    title: string;
-    topic: string;
-    difficultyLevel: number;
-    questionCount: number;
-    maxScore: number;
-    createdAt: string;
-  };
-  learningPath?: {
-    pathId: string;
-    order: number;
-    marxistTopic: {
-      id: string;
-      name: string;
-      title: string;
-    };
-    recommendedReason: string;
-  };
-  // Multi-AI specific fields
-  provider?: string; // 'gemini' | 'grok'
-  loadBalancer?: ILoadBalancerInfo;
 }
 
 // Legacy Gemini Connection Response (for backward compatibility)
