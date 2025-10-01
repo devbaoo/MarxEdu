@@ -77,7 +77,7 @@ const PhilosophyDashboard: React.FC = () => {
 
       // Show optimized loading message for performance improvements
       message.loading(
-        "🚀 Tạo bài học với AI System tối ưu (Queue Management + Batch Operations)... Vui lòng chờ trong giây lát...",
+        "🚀 Tạo bài học với AI System. Vui lòng chờ trong giây lát...",
         0
       );
 
@@ -182,11 +182,9 @@ const PhilosophyDashboard: React.FC = () => {
 
         const concentrationInfo = error.concentrationIssues;
         const distributionText = concentrationInfo?.distribution
-          ? `A:${concentrationInfo.distribution.A || 0}, B:${
-              concentrationInfo.distribution.B || 0
-            }, C:${concentrationInfo.distribution.C || 0}, D:${
-              concentrationInfo.distribution.D || 0
-            }`
+          ? `A:${concentrationInfo.distribution.A || 0}, B:${concentrationInfo.distribution.B || 0
+          }, C:${concentrationInfo.distribution.C || 0}, D:${concentrationInfo.distribution.D || 0
+          }`
           : "";
 
         message.error({
@@ -521,10 +519,10 @@ const PhilosophyDashboard: React.FC = () => {
                         key={item.pathId}
                         size="small"
                         className={`border-l-4 ${item.completed
-                            ? "border-l-green-500 bg-green-50"
-                            : isNewest
-                              ? "border-l-blue-500 bg-blue-50"
-                              : "border-l-gray-300 bg-gray-50"
+                          ? "border-l-green-500 bg-green-50"
+                          : isNewest
+                            ? "border-l-blue-500 bg-blue-50"
+                            : "border-l-gray-300 bg-gray-50"
                           } hover:shadow-md transition-all`}>
                         <div className="flex justify-between items-start">
                           <div className="flex-1">
