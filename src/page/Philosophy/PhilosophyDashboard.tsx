@@ -93,6 +93,7 @@ const PhilosophyDashboard: React.FC = () => {
           const newestLesson =
             learningPathResult.learningPath[
             learningPathResult.learningPath.length - 1
+
             ];
           console.log("🎯 Found newest lesson:", newestLesson);
 
