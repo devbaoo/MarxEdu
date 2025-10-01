@@ -92,6 +92,7 @@ export const GET_LEADERBOARD_ENDPOINT = `${BASE_URL}/leaderboard`;
 
 //marxist philosophy learning system
 export const GENERATE_MARXIST_PHILOSOPHY_LESSON_ENDPOINT = `${BASE_URL}/marxist-philosophy/generate-lesson`;
+export const GENERATE_CUSTOM_MARXIST_PHILOSOPHY_LESSON_ENDPOINT = `${BASE_URL}/marxist-philosophy/generate-custom-lesson`;
 export const GET_MARXIST_PHILOSOPHY_LEARNING_PATH_ENDPOINT = `${BASE_URL}/marxist-philosophy/learning-path`;
 export const GET_MARXIST_PHILOSOPHY_LESSON_BY_PATH_ENDPOINT = (
   pathId: string
@@ -100,6 +101,7 @@ export const COMPLETE_MARXIST_PHILOSOPHY_LESSON_ENDPOINT = `${BASE_URL}/marxist-
 export const RETRY_MARXIST_PHILOSOPHY_LESSON_ENDPOINT = `${BASE_URL}/marxist-philosophy/retry-lesson`;
 export const GET_MARXIST_PHILOSOPHY_STATS_ENDPOINT = `${BASE_URL}/marxist-philosophy/stats`;
 export const GET_MARXIST_PHILOSOPHY_TOPICS_ENDPOINT = `${BASE_URL}/marxist-philosophy/topics`;
+export const GET_AVAILABLE_MARXIST_PHILOSOPHY_TOPICS_ENDPOINT = `${BASE_URL}/marxist-philosophy/available-topics`;
 export const ANALYZE_MARXIST_PHILOSOPHY_PROGRESS_ENDPOINT = `${BASE_URL}/marxist-philosophy/analyze-progress`;
 export const TEST_MARXIST_PHILOSOPHY_CONNECTION_ENDPOINT = `${BASE_URL}/marxist-philosophy/test-connection`;
 export const TEST_MARXIST_PHILOSOPHY_GEMINI_ENDPOINT = `${BASE_URL}/marxist-philosophy/test-gemini`;
