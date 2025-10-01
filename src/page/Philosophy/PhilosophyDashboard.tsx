@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import {
   Card,
   Button,
@@ -32,6 +32,8 @@ import {
   clearPhilosophySuccess,
 } from "@/services/features/marxist/philosophySlice";
 import { useNavigate } from "react-router-dom";
+import CustomLessonForm from "@/components/Philosophy/CustomLessonForm";
+import { IGenerateMarxistPhilosophyLessonResponse } from "@/interfaces/IMarxist";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -60,6 +62,73 @@ const PhilosophyDashboard: React.FC = () => {
 
   // Type assertion for learningPath items
   const typedLearningPath = learningPath as LearningPathItem[];
+
+  const navigateToLesson = useCallback(
+    async (result: IGenerateMarxistPhilosophyLessonResponse) => {
+      if (result.success && result.learningPath?.pathId) {
+        const pathId = result.learningPath.pathId;
+        console.log("✅ Lesson created successfully, navigating to:", pathId);
+
+        setTimeout(() => {
+          window.location.href = `/philosophy-lesson/${pathId}`;
+        }, 500);
+        return;
+      }
+
+      if (result.success && result.lesson?.lessonId) {
+        console.log(
+          "⚠️ No pathId found, trying to navigate with lessonId:",
+          result.lesson.lessonId
+        );
+
+        const learningPathResult = await dispatch(
+          getMarxistPhilosophyLearningPath({})
+        ).unwrap();
+        console.log("📝 Refreshed learning path:", learningPathResult);
+
+        if (
+          learningPathResult.success &&
+          learningPathResult.learningPath.length > 0
+        ) {
+          const newestLesson =
+            learningPathResult.learningPath[
+              learningPathResult.learningPath.length - 1
+            ];
+          console.log("🎯 Found newest lesson:", newestLesson);
+
+          if (newestLesson.pathId) {
+            setTimeout(() => {
+              window.location.href = `/philosophy-lesson/${newestLesson.pathId}`;
+            }, 500);
+            return;
+          }
+        }
+      }
+
+      console.log(
+        "⚠️ Could not auto-navigate, refreshing learning path for manual navigation"
+      );
+      await dispatch(getMarxistPhilosophyLearningPath({}));
+    },
+    [dispatch]
+  );
+
+  const handleCustomLessonCreated = useCallback(
+    async (result: IGenerateMarxistPhilosophyLessonResponse) => {
+      const lessonTitle = result.lesson?.title || "Bài học tuỳ chọn";
+      const difficultyLabel = result.lesson?.difficultyLevel
+        ? ` (Độ khó ${result.lesson.difficultyLevel})`
+        : "";
+
+      message.success({
+        content: `🎉 Bài học "${lessonTitle}" đã được tạo thành công${difficultyLabel}!`,
+        duration: 6,
+      });
+
+      await navigateToLesson(result);
+    },
+    [navigateToLesson]
+  );
 
   useEffect(() => {
     dispatch(getMarxistPhilosophyLearningPath({}));
@@ -105,55 +174,7 @@ const PhilosophyDashboard: React.FC = () => {
         duration: 8, // Longer duration để user có thể đọc performance info
       });
 
-      // Simplified flow: Just navigate to lesson after successful generation
-      if (result.success && result.learningPath?.pathId) {
-        const pathId = result.learningPath.pathId;
-        console.log("✅ Lesson created successfully, navigating to:", pathId);
-
-        // Navigate directly to lesson without ContentPack generation
-        setTimeout(() => {
-          window.location.href = `/philosophy-lesson/${pathId}`;
-        }, 500);
-      }
-
-      // Alternative: Check if lesson was created and use lessonId as fallback
-      if (result.success && result.lesson?.lessonId) {
-        console.log(
-          "⚠️ No pathId found, trying to navigate with lessonId:",
-          result.lesson.lessonId
-        );
-
-        // Refresh learning path first to get the pathId
-        const learningPathResult = await dispatch(
-          getMarxistPhilosophyLearningPath({})
-        ).unwrap();
-        console.log("📝 Refreshed learning path:", learningPathResult);
-
-        // Find the newest lesson (should be the one we just created)
-        if (
-          learningPathResult.success &&
-          learningPathResult.learningPath.length > 0
-        ) {
-          const newestLesson =
-            learningPathResult.learningPath[
-            learningPathResult.learningPath.length - 1
-            ];
-          console.log("🎯 Found newest lesson:", newestLesson);
-
-          if (newestLesson.pathId) {
-            setTimeout(() => {
-              window.location.href = `/philosophy-lesson/${newestLesson.pathId}`;
-            }, 500);
-            return;
-          }
-        }
-      }
-
-      // Final fallback: just refresh learning path and show success message
-      console.log(
-        "⚠️ Could not auto-navigate, refreshing learning path for manual navigation"
-      );
-      await dispatch(getMarxistPhilosophyLearningPath({}));
+      await navigateToLesson(result);
     } catch (err) {
       console.error("❌ Error generating lesson:", err);
       message.destroy(); // Clear loading message
@@ -704,8 +725,8 @@ const PhilosophyDashboard: React.FC = () => {
                     </Button>
                   </div>
                 ) : (
-                  <div>
-                    <Paragraph className="text-gray-600 mb-4">
+                  <Space direction="vertical" className="w-full" size="middle">
+                    <Paragraph className="mb-0 text-gray-600">
                       {learningPath.length === 0
                         ? "Tạo bài học triết học đầu tiên của bạn với sự hỗ trợ của AI"
                         : "Tạo bài học triết học mới dựa trên tiến độ học tập của bạn"}
@@ -720,7 +741,10 @@ const PhilosophyDashboard: React.FC = () => {
                       className="bg-red-600 hover:bg-red-700">
                       🤖 Tạo bài học với AI
                     </Button>
-                  </div>
+                    <CustomLessonForm
+                      onLessonCreated={handleCustomLessonCreated}
+                    />
+                  </Space>
                 )}
               </Card>
 
