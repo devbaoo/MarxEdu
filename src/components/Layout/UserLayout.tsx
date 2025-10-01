@@ -12,6 +12,7 @@ const UserLayout = () => {
     const dispatch = useAppDispatch();
     const hideSidebar = location.pathname.startsWith('/lesson/');
     const [isCheckInModalOpen, setIsCheckInModalOpen] = useState(false);
+    const [hasAutoPromptedCheckIn, setHasAutoPromptedCheckIn] = useState(false);
     const { isAuthenticated } = useAppSelector((state) => state.auth);
     const { checkInStatus } = useAppSelector((state) => state.checkIn);
 
@@ -24,18 +25,29 @@ const UserLayout = () => {
 
     // Show check-in modal when user logs in and hasn't checked in yet
     useEffect(() => {
-        if (isAuthenticated && checkInStatus && !checkInStatus.hasCheckedInToday) {
+        if (
+            isAuthenticated &&
+            checkInStatus &&
+            !checkInStatus.hasCheckedInToday &&
+            !hasAutoPromptedCheckIn
+        ) {
             // Don't show modal on lesson pages
             if (!hideSidebar) {
                 // Wait a moment before showing the modal to avoid immediate popup
                 const timer = setTimeout(() => {
                     setIsCheckInModalOpen(true);
+                    setHasAutoPromptedCheckIn(true);
                 }, 1500);
 
                 return () => clearTimeout(timer);
             }
         }
-    }, [isAuthenticated, checkInStatus, hideSidebar]);
+    }, [isAuthenticated, checkInStatus, hideSidebar, hasAutoPromptedCheckIn]);
+
+    const handleCloseCheckInModal = () => {
+        setIsCheckInModalOpen(false);
+        setHasAutoPromptedCheckIn(true); // prevent the auto prompt loop
+    };
 
     return (
         <div className="flex flex-col min-h-screen bg-gradient-to-br from-red-50 to-amber-50">
@@ -48,10 +60,7 @@ const UserLayout = () => {
             </div>
 
             {/* Check-in Modal */}
-            <CheckInModal
-                isOpen={isCheckInModalOpen}
-                onClose={() => setIsCheckInModalOpen(false)}
-            />
+            <CheckInModal isOpen={isCheckInModalOpen} onClose={handleCloseCheckInModal} />
 
             {/* Survey Button */}
             <SurveyButton />
