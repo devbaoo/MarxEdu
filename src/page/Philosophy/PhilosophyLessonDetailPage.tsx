@@ -164,7 +164,7 @@ const PhilosophyLessonDetailPage: React.FC = () => {
               {lesson.title}
             </Title>
             <Text className="text-lg text-gray-600">
-              Triết học Mác-Lê-Nin • Bài học AI
+              Triết học Mác-LêNin • Bài học AI
             </Text>
           </div>
 
@@ -272,11 +272,11 @@ const PhilosophyLessonDetailPage: React.FC = () => {
               🎯 Chủ đề:{" "}
               {typeof lesson.topic === "string"
                 ? lesson.topic
-                : lesson.topic?.name || "Triết học Mác-Lê-Nin"}
+                : lesson.topic?.name || "Triết học Mác-LêNin"}
             </Title>
             <Text className="text-purple-600">
               Bài học này sẽ kiểm tra kiến thức của bạn về các khái niệm cơ bản
-              và nâng cao trong triết học Mác-Lê-Nin, giúp bạn hiểu sâu hơn về
+              và nâng cao trong triết học Mác-LêNin, giúp bạn hiểu sâu hơn về
               tư tưởng triết học cách mạng.
             </Text>
           </div>

@@ -14,7 +14,7 @@ import {
 const menuItems = [
   {
     icon: "https://d35aaqx5ub95lt.cloudfront.net/vendor/784035717e2ff1d448c0f6cc4efc89fb.svg",
-    label: "Học Triết học Mác-Lê-Nin",
+    label: "Học Triết học Mác-LêNin",
     href: "/marxist-economics",
   },
   {
@@ -111,11 +111,10 @@ export default function Sidebar() {
       {/* Sidebar */}
       <aside
         className={`fixed top-0 left-0 h-screen bg-white border-r-2 border-gray-200 px-4 py-6 overflow-y-auto z-[210] transition-transform duration-300 ease-in-out
-                ${
-                  isMobileMenuOpen
-                    ? "translate-x-0"
-                    : "-translate-x-full lg:translate-x-0"
-                }
+                ${isMobileMenuOpen
+            ? "translate-x-0"
+            : "-translate-x-full lg:translate-x-0"
+          }
                 w-[280px] sm:w-[224px]`}
       >
         <nav className="flex flex-col gap-3">
@@ -139,11 +138,10 @@ export default function Sidebar() {
                   }
                 }}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold 
-                                ${
-                                  item.href === window.location.pathname
-                                    ? "bg-gray-100 text-red-600 border border-red-300"
-                                    : "hover:bg-gray-100 text-gray-700"
-                                }`}
+                                ${item.href === window.location.pathname
+                    ? "bg-gray-100 text-red-600 border border-red-300"
+                    : "hover:bg-gray-100 text-gray-700"
+                  }`}
               >
                 <div className="w-8 h-8 flex items-center justify-center">
                   {item.icon ? (

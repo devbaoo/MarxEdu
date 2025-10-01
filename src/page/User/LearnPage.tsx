@@ -22,14 +22,14 @@ const LearnPage: React.FC = () => {
         <div className="text-center">
           <Alert
             message="🚩 Chuyển hướng đến MarxEdu"
-            description="Trang học tiếng Anh đã được thay thế bằng hệ thống học Triết học Mác-Lê-Nin."
+            description="Trang học tiếng Anh đã được thay thế bằng hệ thống học Triết học Mác-LêNin."
             type="info"
             showIcon
             className="mb-6"
           />
 
           <Title level={2} className="text-red-700 mb-4">
-            MarxEdu - Triết học Mác-Lê-Nin
+            MarxEdu - Triết học Mác-LêNin
           </Title>
 
           <div className="mb-6">

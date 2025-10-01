@@ -40,6 +40,9 @@ export const NOTIFICATIONS_ALL_ENDPOINT = `${BASE_URL}/admin/notifications/all`;
 export const GET_ALL_LESSONS_ENDPOINT = `${BASE_URL}/admin/lessons`;
 export const UPDATE_USER_ROLE_ENDPOINT = (id: string) =>
   `${BASE_URL}/users/${id}/role`;
+export const GET_TOTAL_USER_OVERVIEW_ENDPOINT = `${BASE_URL}/total-user`;
+export const GET_TOTAL_USER_BY_MONTH_ENDPOINT = `${BASE_URL}/total-user-by-month`;
+export const GET_TOTAL_REVENUE_ENDPOINT = `${BASE_URL}/total-revenue`;
 
 //package
 export const GET_PACKAGES_ENDPOINT = `${BASE_URL}/admin/packages`;

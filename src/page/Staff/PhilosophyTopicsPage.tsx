@@ -120,7 +120,7 @@ const PhilosophyTopicsPage: React.FC = () => {
       content: (
         <div>
           <p>
-            Tạo các chủ đề triết học Mác-Lê-Nin mẫu để bắt đầu sử dụng hệ thống?
+            Tạo các chủ đề triết học Mác-LêNin mẫu để bắt đầu sử dụng hệ thống?
           </p>
           <p className="text-blue-600">
             💡 Điều này sẽ tạo các chủ đề cơ bản về triết học Marxist-Leninist.
@@ -262,7 +262,7 @@ const PhilosophyTopicsPage: React.FC = () => {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <Title level={2}>🏛️ Quản lý chủ đề triết học Mác-Lê-Nin</Title>
+        <Title level={2}>🏛️ Quản lý chủ đề triết học Mác-LêNin</Title>
         <Text className="text-gray-600">
           Quản lý các chủ đề triết học để AI tạo bài học phù hợp
         </Text>
@@ -361,7 +361,7 @@ const PhilosophyTopicsPage: React.FC = () => {
             name="title"
             rules={[{ required: true, message: "Vui lòng nhập tiêu đề!" }]}
           >
-            <Input placeholder="vd: Cơ sở triết học Mác-Lê-Nin" />
+            <Input placeholder="vd: Cơ sở triết học Mác-LêNin" />
           </Form.Item>
 
           <Form.Item

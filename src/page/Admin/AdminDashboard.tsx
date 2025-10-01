@@ -1,98 +1,145 @@
-// import { useSelector } from 'react-redux';
-import { Card, Col, Row, Typography, Statistic } from 'antd';
-import { Pie, Column } from '@ant-design/plots';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Card, Col, Row, Typography, Statistic, Spin, message, Empty } from 'antd';
+import { Column } from '@ant-design/plots';
+import { UserOutlined, DollarCircleOutlined, ShoppingOutlined } from '@ant-design/icons';
+import { isAxiosError } from 'axios';
+import axiosInstance from '@/services/constant/axiosInstance';
 import {
-  UserOutlined,
-  BookOutlined,
-  TrophyOutlined,
-  AppstoreOutlined,
-} from '@ant-design/icons';
-// import { RootState } from '@/services/store/store';
+  GET_TOTAL_USER_OVERVIEW_ENDPOINT,
+  GET_TOTAL_USER_BY_MONTH_ENDPOINT,
+  GET_TOTAL_REVENUE_ENDPOINT,
+} from '@/services/constant/apiConfig';
 
 const { Title, Text } = Typography;
 
+interface TotalUserResponse {
+  success: boolean;
+  statusCode?: number;
+  message?: string;
+  total?: number;
+}
+
+interface TotalUserByMonthItem {
+  month: string;
+  value: number;
+}
+
+interface TotalUserByMonthResponse {
+  success: boolean;
+  statusCode?: number;
+  message?: string;
+  data?: TotalUserByMonthItem[];
+  meta?: {
+    year?: number;
+  };
+}
+
+interface TotalRevenueResponse {
+  success: boolean;
+  statusCode?: number;
+  message?: string;
+  totalRevenue?: number;
+  completedTransactions?: number;
+}
+
+interface RevenueSummary {
+  totalRevenue: number | null;
+  completedTransactions: number | null;
+}
+
 const AdminDashboard = () => {
-  // const { user } = useSelector((state: RootState) => state.auth);
+  const [loading, setLoading] = useState(false);
+  const [totalUsers, setTotalUsers] = useState<number | null>(null);
+  const [monthlyUserData, setMonthlyUserData] = useState<TotalUserByMonthItem[]>([]);
+  const [dashboardYear, setDashboardYear] = useState<number | null>(null);
+  const [revenueSummary, setRevenueSummary] = useState<RevenueSummary>({
+    totalRevenue: null,
+    completedTransactions: null,
+  });
 
-  // Fake data - Pie chart: Tỷ lệ cấp độ người dùng
-  const roleData = [
-    { type: 'Level 1', value: 2 },
-    { type: 'Level 2', value: 12 },
-    { type: 'Level 3', value: 12 },
-    { type: 'Level 4', value: 12 },
-    { type: 'Level 5', value: 12 },
-  ];
+  const handleDashboardError = useCallback((error: unknown) => {
+    console.error('Failed to load admin dashboard metrics:', error);
 
-  const pieConfig = {
-    appendPadding: 10,
-    data: roleData,
-    angleField: 'value',
-    colorField: 'type',
-    radius: 1,
-    label: {
-      type: 'inner',
-      offset: '-30%',
-      content: '{value}',
-      style: { fontSize: 14, textAlign: 'center' },
-    },
-    interactions: [{ type: 'element-active' }],
-  };
+    if (isAxiosError(error) && error.response) {
+      if (error.response.status === 401) {
+        message.error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+        return;
+      }
 
-  // Fake data - Column chart: Người đăng ký theo tháng
-  const monthlyUserData = [
-    { month: 'Tháng 1', value: 120 },
-    { month: 'Tháng 2', value: 98 },
-    { month: 'Tháng 3', value: 150 },
-    { month: 'Tháng 4', value: 180 },
-    { month: 'Tháng 5', value: 130 },
-    { month: 'Tháng 6', value: 165 },
-  ];
+      if (error.response.status === 403) {
+        message.error('Bạn không có quyền truy cập dashboard này.');
+        return;
+      }
+    }
 
-  const columnConfig = {
-    data: monthlyUserData,
-    xField: 'month',
-    yField: 'value',
-    color: '#1890ff',
-    label: {
-      position: 'middle',
-      style: {
-        fill: '#fff',
-        fontSize: 12,
-        textAlign: 'center',
-      },
-    },
-    xAxis: {
+    message.error('Không thể tải dữ liệu dashboard. Vui lòng thử lại sau.');
+  }, []);
+
+  const fetchDashboardData = useCallback(async () => {
+    setLoading(true);
+
+    try {
+      const [totalUserRes, monthlyRes, revenueRes] = await Promise.all([
+        axiosInstance.get<TotalUserResponse>(GET_TOTAL_USER_OVERVIEW_ENDPOINT),
+        axiosInstance.get<TotalUserByMonthResponse>(GET_TOTAL_USER_BY_MONTH_ENDPOINT),
+        axiosInstance.get<TotalRevenueResponse>(GET_TOTAL_REVENUE_ENDPOINT),
+      ]);
+
+      const userTotal = typeof totalUserRes.data?.total === 'number' ? totalUserRes.data.total : null;
+      const monthlyData = Array.isArray(monthlyRes.data?.data) ? monthlyRes.data?.data : [];
+      const resolvedYear = monthlyRes.data?.meta?.year ?? null;
+      const totalRevenue = typeof revenueRes.data?.totalRevenue === 'number'
+        ? revenueRes.data.totalRevenue
+        : null;
+      const completedTransactions = typeof revenueRes.data?.completedTransactions === 'number'
+        ? revenueRes.data.completedTransactions
+        : null;
+
+      setTotalUsers(userTotal);
+      setMonthlyUserData(monthlyData);
+      setDashboardYear(resolvedYear);
+      setRevenueSummary({ totalRevenue, completedTransactions });
+    } catch (error) {
+      handleDashboardError(error);
+    } finally {
+      setLoading(false);
+    }
+  }, [handleDashboardError]);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, [fetchDashboardData]);
+
+  const columnConfig = useMemo(
+    () => ({
+      data: monthlyUserData,
+      xField: 'month',
+      yField: 'value',
+      color: '#1890ff',
+      columnWidthRatio: 0.6,
       label: {
-        autoRotate: false,
+        position: 'middle',
+        style: {
+          fill: '#fff',
+          fontSize: 12,
+          textAlign: 'center',
+        },
       },
-    },
-    meta: {
-      month: { alias: 'Tháng' },
-      value: { alias: 'Số người đăng ký' },
-    },
-  };
-  const skillDistribution = [
-    { type: 'Listening', value: 25 },
-    { type: 'Reading', value: 20 },
-    { type: 'Writing', value: 15 },
-    { type: 'Speaking', value: 40 },
-  ];
+      xAxis: {
+        label: {
+          autoRotate: false,
+        },
+      },
+      meta: {
+        month: { alias: 'Tháng' },
+        value: { alias: 'Người đăng ký' },
+      },
+    }),
+    [monthlyUserData]
+  );
 
-  const pieSkillConfig = {
-    appendPadding: 10,
-    data: skillDistribution,
-    angleField: 'value',
-    colorField: 'type',
-    radius: 1,
-    label: {
-      type: 'inner',
-      offset: '-30%',
-      content: '{value}',
-      style: { fontSize: 14, textAlign: 'center' },
-    },
-    interactions: [{ type: 'element-active' }],
-  };
-
+  const totalRevenue = revenueSummary.totalRevenue;
+  const completedTransactions = revenueSummary.completedTransactions;
 
   return (
     <div style={{ padding: 24 }}>
@@ -101,51 +148,46 @@ const AdminDashboard = () => {
       <Row gutter={[16, 16]} style={{ marginBottom: 32 }}>
         <SummaryCard
           title="Người dùng"
-          count={1234}
+          count={totalUsers}
           icon={<UserOutlined />}
           color="blue"
           subtitle="Tổng số người dùng"
+          loading={loading && totalUsers === null}
         />
         <SummaryCard
-          title="Bài học"
-          count={320}
-          icon={<BookOutlined />}
-          color="purple"
-          subtitle="Tổng số bài học"
-        />
-        <SummaryCard
-          title="Cấp độ"
-          count={6}
-          icon={<TrophyOutlined />}
-          color="red"
-          subtitle="Tổng số cấp độ"
-        />
-        <SummaryCard
-          title="Kỹ năng"
-          count={4}
-          icon={<AppstoreOutlined />}
+          title="Doanh thu"
+          count={totalRevenue}
+          icon={<DollarCircleOutlined />}
           color="green"
-          subtitle="Tổng số kỹ năng"
+          subtitle="Doanh thu tích lũy (₫)"
+          prefix="₫"
+          loading={loading && totalRevenue === null}
+        />
+        <SummaryCard
+          title="Giao dịch thành công"
+          count={completedTransactions}
+          icon={<ShoppingOutlined />}
+          color="purple"
+          subtitle="Số lượt thanh toán hoàn tất"
+          loading={loading && completedTransactions === null}
         />
       </Row>
 
       <Row gutter={[16, 16]}>
-        <Col xs={24} md={16}>
-          <Card title="Số lượng người đăng ký theo tháng">
-            <Column {...columnConfig} height={500} />
-          </Card>
-        </Col>
-        <Col xs={4} md={4} lg={6}>
-          <Card title="Tỷ lệ cấp độ người dùng">
-            <Pie {...pieConfig} height={200} />
-          </Card>
-          <Card title="Tỷ lệ kỹ năng người dùng">
-            <Pie {...pieSkillConfig} height={200} />
+        <Col xs={24}>
+          <Card
+            title={`Người dùng đăng ký theo tháng${dashboardYear ? ` (${dashboardYear})` : ''}`}
+          >
+            <Spin spinning={loading} tip="Đang tải dữ liệu">
+              {monthlyUserData.length ? (
+                <Column {...columnConfig} height={400} />
+              ) : (
+                <Empty description="Không có dữ liệu" />
+              )}
+            </Spin>
           </Card>
         </Col>
       </Row>
-
-
     </div>
   );
 };
@@ -156,15 +198,22 @@ const SummaryCard = ({
   subtitle,
   color,
   icon,
+  loading = false,
+  prefix,
 }: {
   title: string;
-  count: number;
+  count: number | null;
   subtitle: string;
-  color: string;
+  color: keyof typeof colorMap;
   icon: React.ReactNode;
+  loading?: boolean;
+  prefix?: React.ReactNode;
 }) => {
+  const displayValue: string | number = count == null ? '-' : count;
+  const statisticPrefix = displayValue === '-' ? undefined : prefix;
+
   return (
-    <Col xs={24} sm={12} md={6}>
+    <Col xs={24} sm={12} md={8}>
       <Card bordered>
         <Row align="middle" justify="space-between">
           <Col>
@@ -172,9 +221,11 @@ const SummaryCard = ({
               {title}
             </Text>
             <Statistic
-              value={count}
+              value={displayValue}
               valueStyle={{ fontSize: 28, fontWeight: 'bold' }}
               groupSeparator="."
+              loading={loading}
+              prefix={statisticPrefix}
             />
             <div style={{ color: '#888' }}>{subtitle}</div>
           </Col>

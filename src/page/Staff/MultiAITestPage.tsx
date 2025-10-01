@@ -135,7 +135,7 @@ const MultiAITestPage: React.FC = () => {
         </Title>
         <Paragraph className="text-gray-600">
           Kiểm tra kết nối và chức năng của hệ thống Multi-AI (Gemini + Grok4)
-          để tạo câu hỏi triết học Mác-Lê-Nin
+          để tạo câu hỏi triết học Mác-LêNin
         </Paragraph>
 
         {/* Quick Status Overview */}
@@ -148,15 +148,13 @@ const MultiAITestPage: React.FC = () => {
               <div className="flex gap-4 mt-2">
                 <Badge
                   status={multiAI.providers.gemini ? "success" : "error"}
-                  text={`Gemini: ${
-                    multiAI.providers.gemini ? "Hoạt động" : "Lỗi"
-                  }`}
+                  text={`Gemini: ${multiAI.providers.gemini ? "Hoạt động" : "Lỗi"
+                    }`}
                 />
                 <Badge
                   status={multiAI.providers.grok ? "success" : "error"}
-                  text={`Grok4: ${
-                    multiAI.providers.grok ? "Hoạt động" : "Lỗi"
-                  }`}
+                  text={`Grok4: ${multiAI.providers.grok ? "Hoạt động" : "Lỗi"
+                    }`}
                 />
               </div>
             }
@@ -197,7 +195,7 @@ const MultiAITestPage: React.FC = () => {
                       percent={Math.round(
                         (testResult.summary.connected /
                           testResult.summary.total) *
-                          100
+                        100
                       )}
                       strokeColor={{
                         "0%": "#ff4d4f",
@@ -251,7 +249,7 @@ const MultiAITestPage: React.FC = () => {
                           <Tag
                             color={
                               testResult.results.gemini.config.apiKeyStatus ===
-                              "Present"
+                                "Present"
                                 ? "green"
                                 : "red"
                             }
@@ -308,7 +306,7 @@ const MultiAITestPage: React.FC = () => {
                           <Tag
                             color={
                               testResult.results.grok.config.apiKeyStatus ===
-                              "Present"
+                                "Present"
                                 ? "green"
                                 : "red"
                             }

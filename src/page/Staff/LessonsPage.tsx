@@ -21,7 +21,7 @@ const LessonsPage: React.FC = () => {
       <Card>
         <Alert
           message="⚠️ Trang này đã được di chuyển"
-          description="Trang quản lý bài học tiếng Anh đã được thay thế bằng trang quản lý bài học Triết học Mác-Lê-Nin."
+          description="Trang quản lý bài học tiếng Anh đã được thay thế bằng trang quản lý bài học Triết học Mác-LêNin."
           type="warning"
           showIcon
           className="mb-4"
