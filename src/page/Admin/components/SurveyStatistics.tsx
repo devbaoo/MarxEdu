@@ -1,7 +1,7 @@
 import React from "react";
 import { ISurveyStatistics } from "../../../interfaces/ISurvey";
 import { Card, Progress, Divider, Empty, Table, Tag, Typography } from "antd";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, PieChart, Pie, Legend } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, PieChart, Pie } from "recharts";
 
 const { Title, Text } = Typography;
 
@@ -12,6 +12,51 @@ interface SurveyStatisticsProps {
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8"];
 
 const SurveyStatistics: React.FC<SurveyStatisticsProps> = ({ statistics }) => {
+    const formatPercentage = (value: number | undefined) => {
+        if (typeof value !== "number" || Number.isNaN(value)) {
+            return "0%";
+        }
+        const normalizedValue = value > 0 && value <= 1 ? value * 100 : value;
+        const rounded = Number(
+            normalizedValue.toFixed(normalizedValue % 1 === 0 ? 0 : 1)
+        );
+        return `${rounded}%`;
+    };
+
+    const renderPieLegendItems = (data: Array<{ name: string; value: number; percentage?: number }>) => (
+        <div className="w-full">
+            <div className="space-y-2">
+                {data.map((item, index) => {
+                    const percentValue =
+                        typeof item.percentage === "number" ? item.percentage : 0;
+
+                    return (
+                        <div
+                            key={`${item.name}-${index}`}
+                            className="flex flex-col gap-1 rounded-md border border-gray-100 bg-white px-3 py-2 shadow-sm"
+                        >
+                            <div className="flex items-center gap-2 text-gray-700">
+                                <span
+                                    className="inline-block h-3 w-3 flex-shrink-0 rounded-full"
+                                    style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                                />
+                                <span className="font-medium leading-tight">
+                                    {item.name}
+                                </span>
+                            </div>
+                            <div className="flex items-center justify-between text-xs text-gray-500">
+                                <span>{item.value} người</span>
+                                <span className="font-semibold text-gray-800">
+                                    {formatPercentage(percentValue)}
+                                </span>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+
     const renderRatingQuestion = (question: any) => {
         const data = question.ratingDistribution.map((item: any) => ({
             name: `${item.rating} sao`,
@@ -63,35 +108,37 @@ const SurveyStatistics: React.FC<SurveyStatisticsProps> = ({ statistics }) => {
                     </div>
 
                     <div>
-                        <ResponsiveContainer width="100%" height={200}>
-                            <PieChart>
-                                <Pie
-                                    data={data}
-                                    cx="50%"
-                                    cy="50%"
-                                    labelLine={false}
-                                    outerRadius={80}
-                                    fill="#8884d8"
-                                    dataKey="value"
-                                    nameKey="name"
-                  label={(props) => {
-                    const { name, percent } = props;
-                    const percentValue = typeof percent === 'number' ? percent : 0;
-                    return `${name}: ${(percentValue * 100).toFixed(0)}%`;
-                  }}
-                                >
-                                    {data.map((_: any, index: number) => (
-                                        <Cell
-                                            key={`cell-${index}`}
-                                            fill={COLORS[index % COLORS.length]}
+                        <div className="flex flex-col md:flex-row md:items-start gap-4">
+                            <div className="w-full md:w-1/2">
+                                <ResponsiveContainer width="100%" height={220}>
+                                    <PieChart>
+                                        <Pie
+                                            data={data}
+                                            cx="50%"
+                                            cy="50%"
+                                            labelLine={false}
+                                            outerRadius={80}
+                                            fill="#8884d8"
+                                            dataKey="value"
+                                            nameKey="name"
+                                        >
+                                            {data.map((_: any, index: number) => (
+                                                <Cell
+                                                    key={`cell-${index}`}
+                                                    fill={COLORS[index % COLORS.length]}
+                                                />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip
+                                            formatter={(value: any) => [`${value} người`, "Số lượng"]}
                                         />
-                                    ))}
-                                </Pie>
-                                <Tooltip
-                                    formatter={(value: any) => [`${value} người`, "Số lượng"]}
-                                />
-                            </PieChart>
-                        </ResponsiveContainer>
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </div>
+                            <div className="w-full md:w-1/2">
+                                {renderPieLegendItems(data)}
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -149,36 +196,37 @@ const SurveyStatistics: React.FC<SurveyStatisticsProps> = ({ statistics }) => {
                     </div>
 
                     <div>
-                        <ResponsiveContainer width="100%" height={200}>
-                            <PieChart>
-                                <Pie
-                                    data={data}
-                                    cx="50%"
-                                    cy="50%"
-                                    labelLine={false}
-                                    outerRadius={80}
-                                    fill="#8884d8"
-                                    dataKey="value"
-                                    nameKey="name"
-                  label={(props) => {
-                    const { name, percent } = props;
-                    const percentValue = typeof percent === 'number' ? percent : 0;
-                    return `${name}: ${(percentValue * 100).toFixed(0)}%`;
-                  }}
-                                >
-                                    {data.map((_: any, index: number) => (
-                                        <Cell
-                                            key={`cell-${index}`}
-                                            fill={COLORS[index % COLORS.length]}
+                        <div className="flex flex-col md:flex-row md:items-start gap-4">
+                            <div className="w-full md:w-1/2">
+                                <ResponsiveContainer width="100%" height={220}>
+                                    <PieChart>
+                                        <Pie
+                                            data={data}
+                                            cx="50%"
+                                            cy="50%"
+                                            labelLine={false}
+                                            outerRadius={80}
+                                            fill="#8884d8"
+                                            dataKey="value"
+                                            nameKey="name"
+                                        >
+                                            {data.map((_: any, index: number) => (
+                                                <Cell
+                                                    key={`cell-${index}`}
+                                                    fill={COLORS[index % COLORS.length]}
+                                                />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip
+                                            formatter={(value: any) => [`${value} người`, "Số lượng"]}
                                         />
-                                    ))}
-                                </Pie>
-                                <Tooltip
-                                    formatter={(value: any) => [`${value} người`, "Số lượng"]}
-                                />
-                                <Legend />
-                            </PieChart>
-                        </ResponsiveContainer>
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </div>
+                            <div className="w-full md:w-1/2">
+                                {renderPieLegendItems(data)}
+                            </div>
+                        </div>
                     </div>
                 </div>
 
