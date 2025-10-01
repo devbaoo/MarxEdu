@@ -42,7 +42,7 @@ const StaffDashboard = () => {
           🚩 Dashboard Giảng viên
         </Title>
         <Paragraph className="text-gray-600">
-          Quản lý hệ thống học tập Triết học Mác-Lê-Nin
+          Quản lý hệ thống học tập Triết học Mác-LêNin
         </Paragraph>
       </div>
 
@@ -76,7 +76,7 @@ const StaffDashboard = () => {
               Chủ đề Marxist
             </Title>
             <Text type="secondary" className="block mb-4">
-              Quản lý các chủ đề triết học Mác-Lê-Nin
+              Quản lý các chủ đề triết học Mác-LêNin
             </Text>
             <Button
               type="primary"
@@ -167,7 +167,7 @@ const StaffDashboard = () => {
           🌟 Chào mừng, {user?.firstName}!
         </Title>
         <Paragraph className="text-white text-lg mb-0">
-          Bạn đang quản lý hệ thống học tập Triết học Mác-Lê-Nin với Multi-AI
+          Bạn đang quản lý hệ thống học tập Triết học Mác-LêNin với Multi-AI
           System (Gemini + Grok4). Sử dụng các công cụ trên để hỗ trợ học viên
           và phát triển nội dung học tập chất lượng cao.
         </Paragraph>

@@ -181,7 +181,7 @@ const PhilosophyLessonsPage: React.FC = () => {
       <div className="mb-6">
         <Title level={2}>📚 Bài học triết học AI đã tạo</Title>
         <Text className="text-gray-600">
-          Xem và quản lý tất cả các bài học triết học Mác-Lê-Nin được AI tạo ra
+          Xem và quản lý tất cả các bài học triết học Mác-LêNin được AI tạo ra
         </Text>
       </div>
 

@@ -92,7 +92,8 @@ const PhilosophyDashboard: React.FC = () => {
         ) {
           const newestLesson =
             learningPathResult.learningPath[
-              learningPathResult.learningPath.length - 1
+            learningPathResult.learningPath.length - 1
+
             ];
           console.log("🎯 Found newest lesson:", newestLesson);
 
@@ -410,7 +411,7 @@ const PhilosophyDashboard: React.FC = () => {
         <div className="text-center mb-8">
           <div className="inline-block transform -translate-x-4">
             <Title level={1} className="text-red-700 mb-2">
-              🏛️ Triết học Mác-Lê-Nin
+              🏛️ Triết học Mác-LêNin
             </Title>
             <Text className="text-lg text-gray-600">
               Khám phá và học tập triết học Marxist-Leninist với AI
@@ -517,7 +518,7 @@ const PhilosophyDashboard: React.FC = () => {
                   </Title>
                   <Paragraph className="text-gray-400 mb-6">
                     Hãy tạo bài học đầu tiên với AI để bắt đầu hành trình khám
-                    phá triết học Mác-Lê-Nin
+                    phá triết học Mác-LêNin
                   </Paragraph>
                   <Button
                     type="primary"

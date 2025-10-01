@@ -12,11 +12,11 @@ const SkillForm: React.FC = () => {
       <Card className="w-full max-w-2xl shadow-xl">
         <div className="text-center">
           <Title level={2} className="text-red-700 mb-4">
-            🚩 MarxEdu - Triết học Mác-Lê-Nin
+            🚩 MarxEdu - Triết học Mác-LêNin
           </Title>
           <Text type="secondary" className="block mb-6">
             Ứng dụng này hiện tại chỉ tập trung vào việc học triết học
-            Mác-Lê-Nin. Các tùy chọn kỹ năng trước đây đã được thay thế bằng hệ
+            Mác-LêNin. Các tùy chọn kỹ năng trước đây đã được thay thế bằng hệ
             thống AI tự động.
           </Text>
           <Button
@@ -25,7 +25,7 @@ const SkillForm: React.FC = () => {
             onClick={() => navigate("/marxist-economics")}
             className="bg-red-600 hover:bg-red-700"
           >
-            Bắt đầu học Triết học Mác-Lê-Nin
+            Bắt đầu học Triết học Mác-LêNin
           </Button>
         </div>
       </Card>

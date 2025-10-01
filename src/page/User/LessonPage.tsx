@@ -22,7 +22,7 @@ const LessonPage: React.FC = () => {
         <div className="text-center">
           <Alert
             message="🚩 Chuyển hướng đến MarxEdu"
-            description="Bài học tiếng Anh đã được thay thế bằng hệ thống bài học Triết học Mác-Lê-Nin."
+            description="Bài học tiếng Anh đã được thay thế bằng hệ thống bài học Triết học Mác-LêNin."
             type="info"
             showIcon
             className="mb-6"

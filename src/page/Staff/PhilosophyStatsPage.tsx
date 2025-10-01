@@ -107,7 +107,7 @@ const PhilosophyStatsPage: React.FC = () => {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <Title level={2}>📊 Thống kê triết học Mác-Lê-Nin</Title>
+        <Title level={2}>📊 Thống kê triết học Mác-LêNin</Title>
         <Text className="text-gray-600">
           Xem thống kê chi tiết về việc học triết học của người dùng
         </Text>
@@ -172,8 +172,8 @@ const PhilosophyStatsPage: React.FC = () => {
                   (typedStats?.completionRate || 0) >= 70
                     ? "#52c41a"
                     : (typedStats?.completionRate || 0) >= 40
-                    ? "#faad14"
-                    : "#ff4d4f",
+                      ? "#faad14"
+                      : "#ff4d4f",
               }}
             />
           </Card>
@@ -190,8 +190,8 @@ const PhilosophyStatsPage: React.FC = () => {
                   (typedStats?.overallAvgScore || 0) >= 80
                     ? "#52c41a"
                     : (typedStats?.overallAvgScore || 0) >= 60
-                    ? "#1890ff"
-                    : "#faad14",
+                      ? "#1890ff"
+                      : "#faad14",
               }}
             />
           </Card>

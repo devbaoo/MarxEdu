@@ -123,8 +123,9 @@ const Rank = forwardRef<RankRef, Record<string, never>>((_props, ref) => {
             console.log('🏆 Fetching leaderboard data...');
             const { data } = await apiMethods.get<ApiResponse<RankUser[]>>(GET_LEADERBOARD_ENDPOINT);
             if (data.success && Array.isArray(data.data)) {
-                setLeaderboardData(data.data);
-                console.log('✅ Leaderboard updated:', data.data.length, 'users');
+                const topTen = data.data.slice(0, 10);
+                setLeaderboardData(topTen);
+                console.log('✅ Leaderboard updated:', topTen.length, 'users');
             }
         } catch (error) {
             console.error('❌ Error fetching leaderboard:', error);
