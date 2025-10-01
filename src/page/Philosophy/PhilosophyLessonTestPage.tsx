@@ -332,6 +332,37 @@ const PhilosophyLessonTestPage: React.FC = () => {
         console.log("📊 Leaderboard refresh event dispatched");
       }
 
+      const answerBreakdown =
+        lesson.questions?.map((question, index) => {
+          const userAnswer = answers.find(
+            (a) => a.questionId === question._id
+          );
+          const correctAnswer = question.correctAnswer || "";
+          const questionText =
+            (
+              question as {
+                content?: string;
+                questionText?: string;
+              }
+            ).content ||
+            (
+              question as {
+                content?: string;
+                questionText?: string;
+              }
+            ).questionText ||
+            `Câu hỏi ${index + 1}`;
+
+          return {
+            index,
+            questionId: question._id,
+            questionText,
+            userAnswer: userAnswer?.selectedAnswer || "Chưa trả lời",
+            correctAnswer,
+            isCorrect: userAnswer?.selectedAnswer === correctAnswer,
+          };
+        }) || [];
+
       // Show success modal with detailed results
       Modal.success({
         title: result.passed
@@ -389,6 +420,60 @@ const PhilosophyLessonTestPage: React.FC = () => {
                 </div>
                 <div className="text-red-700 text-sm">
                   ❤️ Lives còn lại: {result.currentLives}
+                </div>
+              </div>
+            )}
+
+            {answerBreakdown.length > 0 && (
+              <div className="mt-4">
+                <div className="font-semibold text-gray-700 mb-2">
+                  📚 Chi tiết từng câu hỏi
+                </div>
+                <div className="space-y-3 max-h-64 overflow-y-auto pr-2">
+                  {answerBreakdown.map((detail) => (
+                    <div
+                      key={detail.questionId || detail.index}
+                      className={`rounded-lg border p-3 text-sm ${
+                        detail.isCorrect
+                          ? "border-green-200 bg-green-50"
+                          : "border-red-200 bg-red-50"
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <span className="font-semibold text-gray-800">
+                          Câu {detail.index + 1}
+                        </span>
+                        <Tag color={detail.isCorrect ? "green" : "red"}>
+                          {detail.isCorrect ? "Đúng" : "Sai"}
+                        </Tag>
+                      </div>
+                      <div className="mt-2 text-gray-700">
+                        {detail.questionText}
+                      </div>
+                      <div className="mt-2">
+                        <span className="font-medium text-gray-600">
+                          Bạn chọn:
+                        </span>
+                        <span
+                          className={`ml-1 ${
+                            detail.isCorrect ? "text-green-600" : "text-red-600"
+                          }`}
+                        >
+                          {detail.userAnswer}
+                        </span>
+                      </div>
+                      {!detail.isCorrect && (
+                        <div className="mt-1">
+                          <span className="font-medium text-gray-600">
+                            Đáp án đúng:
+                          </span>
+                          <span className="ml-1 text-green-600">
+                            {detail.correctAnswer || "Không có dữ liệu"}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
             )}

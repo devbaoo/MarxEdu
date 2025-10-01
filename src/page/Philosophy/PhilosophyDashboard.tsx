@@ -691,62 +691,61 @@ const PhilosophyDashboard: React.FC = () => {
                   </div>
                 }
                 className="shadow-lg">
-                {hasIncompleteLesson ? (
-                  <div>
-                    <Alert
-                      message="Bạn có bài học chưa hoàn thành"
-                      description={
-                        <div>
-                          <p>
-                            Vui lòng hoàn thành bài học hiện tại trước khi tạo
-                            bài mới:
-                          </p>
-                          <p className="font-semibold mt-2">
-                            "{nextIncompleteLesson?.title}"
-                          </p>
-                        </div>
-                      }
-                      type="info"
-                      showIcon
-                      className="mb-4"
-                    />
-                    <Button
-                      type="primary"
-                      size="large"
-                      block
-                      icon={<BookOutlined />}
-                      onClick={() => {
-                        if (nextIncompleteLesson) {
-                          // Navigate directly to lesson without ContentPack popup
-                          window.location.href = `/philosophy-lesson/${nextIncompleteLesson.pathId}`;
+                <Space direction="vertical" className="w-full" size="middle">
+                  {hasIncompleteLesson && (
+                    <>
+                      <Alert
+                        message="Bạn có bài học chưa hoàn thành"
+                        description={
+                          <div>
+                            <p>
+                              Vui lòng hoàn thành bài học hiện tại trước khi tạo
+                              bài mới:
+                            </p>
+                            <p className="font-semibold mt-2">
+                              "{nextIncompleteLesson?.title}"
+                            </p>
+                          </div>
                         }
-                      }}
-                      className="bg-blue-600 hover:bg-blue-700">
-                      📖 Tiếp tục học bài hiện tại
-                    </Button>
-                  </div>
-                ) : (
-                  <Space direction="vertical" className="w-full" size="middle">
-                    <Paragraph className="mb-0 text-gray-600">
-                      {learningPath.length === 0
-                        ? "Tạo bài học triết học đầu tiên của bạn với sự hỗ trợ của AI"
-                        : "Tạo bài học triết học mới dựa trên tiến độ học tập của bạn"}
-                    </Paragraph>
-                    <Button
-                      type="primary"
-                      size="large"
-                      block
-                      icon={<RocketOutlined />}
-                      onClick={() => handleGenerateLesson()}
-                      loading={loading}
-                      className="bg-red-600 hover:bg-red-700">
-                      🤖 Tạo bài học với AI
-                    </Button>
-                    <CustomLessonForm
-                      onLessonCreated={handleCustomLessonCreated}
-                    />
-                  </Space>
-                )}
+                        type="info"
+                        showIcon
+                        className="mb-2"
+                      />
+                      <Button
+                        type="primary"
+                        size="large"
+                        block
+                        icon={<BookOutlined />}
+                        onClick={() => {
+                          if (nextIncompleteLesson) {
+                            // Navigate directly to lesson without ContentPack popup
+                            window.location.href = `/philosophy-lesson/${nextIncompleteLesson.pathId}`;
+                          }
+                        }}
+                        className="bg-blue-600 hover:bg-blue-700"
+                      >
+                        📖 Tiếp tục học bài hiện tại
+                      </Button>
+                    </>
+                  )}
+                  <Paragraph className="mb-0 text-gray-600">
+                    {learningPath.length === 0
+                      ? "Tạo bài học triết học đầu tiên của bạn với sự hỗ trợ của AI"
+                      : "Tạo bài học triết học mới dựa trên tiến độ học tập của bạn"}
+                  </Paragraph>
+                  <Button
+                    type="primary"
+                    size="large"
+                    block
+                    icon={<RocketOutlined />}
+                    onClick={() => handleGenerateLesson()}
+                    loading={loading}
+                    className="bg-red-600 hover:bg-red-700"
+                  >
+                    🤖 Tạo bài học với AI
+                  </Button>
+                  <CustomLessonForm onLessonCreated={handleCustomLessonCreated} />
+                </Space>
               </Card>
 
               {/* Quick Actions */}
