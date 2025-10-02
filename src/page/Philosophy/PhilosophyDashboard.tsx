@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Card,
   Button,
@@ -9,6 +9,7 @@ import {
   Alert,
   Tag,
   Space,
+  Pagination,
   message,
 } from "antd";
 import {
@@ -56,12 +57,27 @@ const PhilosophyDashboard: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   // const { user } = useAppSelector((state: RootState) => state.auth);
-  const { loading, error, success, learningPath } = useAppSelector(
+  const { loading, error, success, learningPath, pagination } = useAppSelector(
     (state: RootState) => state.philosophy
   );
 
   // Type assertion for learningPath items
   const typedLearningPath = learningPath as LearningPathItem[];
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const totalLessons = pagination?.totalItems ?? typedLearningPath.length;
+
+  const fetchLearningPath = useCallback(
+    (targetPage: number, targetLimit: number) =>
+      dispatch(
+        getMarxistPhilosophyLearningPath({
+          page: targetPage,
+          limit: targetLimit,
+        })
+      ),
+    [dispatch]
+  );
 
   const navigateToLesson = useCallback(
     async (result: IGenerateMarxistPhilosophyLessonResponse) => {
@@ -81,23 +97,46 @@ const PhilosophyDashboard: React.FC = () => {
           result.lesson.lessonId
         );
 
-        const learningPathResult = await dispatch(
-          getMarxistPhilosophyLearningPath({})
+        const initialResult = await dispatch(
+          getMarxistPhilosophyLearningPath({
+            page: 1,
+            limit: pageSize,
+          })
         ).unwrap();
-        console.log("📝 Refreshed learning path:", learningPathResult);
 
-        if (
-          learningPathResult.success &&
-          learningPathResult.learningPath.length > 0
-        ) {
-          const newestLesson =
-            learningPathResult.learningPath[
-            learningPathResult.learningPath.length - 1
+        console.log("📝 Refreshed learning path:", initialResult);
 
-            ];
-          console.log("🎯 Found newest lesson:", newestLesson);
+        if (initialResult.success) {
+          const totalPages = initialResult.pagination?.totalPages || 1;
+          let newestLesson =
+            initialResult.learningPath.length > 0
+              ? initialResult.learningPath[
+                  initialResult.learningPath.length - 1
+                ]
+              : undefined;
 
-          if (newestLesson.pathId) {
+          if (totalPages > 1) {
+            const latestResult = await dispatch(
+              getMarxistPhilosophyLearningPath({
+                page: totalPages,
+                limit: pageSize,
+              })
+            ).unwrap();
+            console.log("🎯 Loaded latest learning path page:", latestResult);
+            newestLesson =
+              latestResult.learningPath.length > 0
+                ? latestResult.learningPath[
+                    latestResult.learningPath.length - 1
+                  ]
+                : newestLesson;
+          }
+
+          if (totalPages !== page) {
+            setPage(totalPages);
+          }
+
+          if (newestLesson?.pathId) {
+
             setTimeout(() => {
               window.location.href = `/philosophy-lesson/${newestLesson.pathId}`;
             }, 500);
@@ -109,9 +148,13 @@ const PhilosophyDashboard: React.FC = () => {
       console.log(
         "⚠️ Could not auto-navigate, refreshing learning path for manual navigation"
       );
-      await dispatch(getMarxistPhilosophyLearningPath({}));
+      if (pagination?.totalPages && pagination.totalPages !== page) {
+        setPage(pagination.totalPages);
+      } else {
+        fetchLearningPath(page, pageSize);
+      }
     },
-    [dispatch]
+    [dispatch, fetchLearningPath, page, pageSize, pagination]
   );
 
   const handleCustomLessonCreated = useCallback(
@@ -132,14 +175,30 @@ const PhilosophyDashboard: React.FC = () => {
   );
 
   useEffect(() => {
-    dispatch(getMarxistPhilosophyLearningPath({}));
-  }, [dispatch]);
+    fetchLearningPath(page, pageSize);
+  }, [fetchLearningPath, page, pageSize]);
+
+  useEffect(() => {
+    if (!isInitialLoad) {
+      return;
+    }
+
+    if (!pagination) {
+      return;
+    }
+
+    const lastPage = Math.max(pagination.totalPages || 1, 1);
+    if (lastPage !== page) {
+      setPage(lastPage);
+    }
+    setIsInitialLoad(false);
+  }, [isInitialLoad, pagination, page]);
 
   const handleGenerateLesson = async (options = {}) => {
     try {
       console.log("🚀 Generating new Marxist Philosophy lesson...");
       console.log("📊 Current learning path state:", {
-        totalLessons: learningPath.length,
+        totalLessons,
         completedLessons: typedLearningPath.filter((p) => p.completed).length,
         hasIncompleteLesson: hasIncompleteLesson,
         canGenerate: !hasIncompleteLesson,
@@ -327,7 +386,7 @@ const PhilosophyDashboard: React.FC = () => {
       }
 
       // Still refresh learning path to show any partial success
-      dispatch(getMarxistPhilosophyLearningPath({}));
+      fetchLearningPath(page, pageSize);
     }
   };
 
@@ -510,7 +569,7 @@ const PhilosophyDashboard: React.FC = () => {
                     Đang tải lộ trình học tập...
                   </p>
                 </div>
-              ) : learningPath.length === 0 ? (
+              ) : totalLessons === 0 ? (
                 <div className="text-center py-12">
                   <BookOutlined className="text-6xl text-gray-300 mb-4" />
                   <Title level={3} className="text-gray-500">
@@ -648,6 +707,26 @@ const PhilosophyDashboard: React.FC = () => {
                       </Card>
                     );
                   })}
+                  {totalLessons > pageSize && (
+                    <div className="flex justify-end pt-4">
+                      <Pagination
+                        current={pagination?.currentPage || page}
+                        pageSize={pagination?.pageSize || pageSize}
+                        total={totalLessons}
+                        showSizeChanger
+                        pageSizeOptions={["10", "20", "50"]}
+                        onChange={(newPage, newSize) => {
+                          if (newSize !== pageSize) {
+                            setPageSize(newSize);
+                            setPage(1);
+                            return;
+                          }
+
+                          setPage(newPage);
+                        }}
+                      />
+                    </div>
+                  )}
                 </div>
               )}
             </Card>
@@ -674,7 +753,7 @@ const PhilosophyDashboard: React.FC = () => {
                     </div>
                     <div className="text-center">
                       <div className="text-2xl font-bold text-green-600">
-                        {typedLearningPath.length}
+                        {totalLessons}
                       </div>
                       <Text className="text-sm text-gray-600">Tổng số bài</Text>
                     </div>
@@ -729,7 +808,7 @@ const PhilosophyDashboard: React.FC = () => {
                     </>
                   )}
                   <Paragraph className="mb-0 text-gray-600">
-                    {learningPath.length === 0
+                    {totalLessons === 0
                       ? "Tạo bài học triết học đầu tiên của bạn với sự hỗ trợ của AI"
                       : "Tạo bài học triết học mới dựa trên tiến độ học tập của bạn"}
                   </Paragraph>
