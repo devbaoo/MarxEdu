@@ -103,6 +103,7 @@ const PhilosophyDashboard: React.FC = () => {
             limit: pageSize,
           })
         ).unwrap();
+
         console.log("📝 Refreshed learning path:", initialResult);
 
         if (initialResult.success) {
@@ -135,6 +136,7 @@ const PhilosophyDashboard: React.FC = () => {
           }
 
           if (newestLesson?.pathId) {
+
             setTimeout(() => {
               window.location.href = `/philosophy-lesson/${newestLesson.pathId}`;
             }, 500);
