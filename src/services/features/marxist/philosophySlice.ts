@@ -49,6 +49,12 @@ interface PhilosophyState {
   error: string | null;
   success: string | null;
   learningPath: IMarxistPhilosophyLearningPath[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    pageSize: number;
+  } | null;
   currentLesson: ILesson | null;
   stats: IMarxistPhilosophyStats | null;
   topics: IMarxistPhilosophyTopic[];
@@ -84,6 +90,7 @@ const initialState: PhilosophyState = {
   error: null,
   success: null,
   learningPath: [],
+  pagination: null,
   currentLesson: null,
   stats: null,
   topics: [],
@@ -558,10 +565,16 @@ const philosophySlice = createSlice({
       .addCase(getMarxistPhilosophyLearningPath.fulfilled, (state, action) => {
         state.loading = false;
         state.learningPath = action.payload.learningPath || [];
+        state.pagination = action.payload.pagination || null;
       })
       .addCase(getMarxistPhilosophyLearningPath.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || "Failed to get learning path";
+        if (action.payload && typeof action.payload === "object") {
+          const payload = action.payload as { message?: string };
+          state.error = payload.message || "Failed to get learning path";
+        } else {
+          state.error = action.error.message || "Failed to get learning path";
+        }
       })
 
       // Get lesson by path
