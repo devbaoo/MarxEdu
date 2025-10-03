@@ -777,7 +777,10 @@ const philosophySlice = createSlice({
         };
       })
       .addCase(getBackgroundGenerationStatus.rejected, (_, action) => {
-        console.error("Failed to get background generation status:", action.error.message);
+        console.error(
+          "Failed to get background generation status:",
+          action.error.message
+        );
         // Keep current state if API fails
       });
   },

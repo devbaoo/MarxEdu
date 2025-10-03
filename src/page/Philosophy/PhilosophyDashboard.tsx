@@ -58,13 +58,13 @@ const PhilosophyDashboard: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   // const { user } = useAppSelector((state: RootState) => state.auth);
-  const { 
-    loading, 
-    error, 
-    success, 
-    learningPath, 
-    pagination, 
-    backgroundStatus 
+  const {
+    loading,
+    error,
+    success,
+    learningPath,
+    pagination,
+    backgroundStatus,
   } = useAppSelector((state: RootState) => state.philosophy);
 
   // Type assertion for learningPath items
@@ -552,12 +552,19 @@ const PhilosophyDashboard: React.FC = () => {
                   <div className="text-sm text-blue-600">
                     {backgroundStatus.elapsedTime ? (
                       <span>
-                        ⏱️ Đã chạy: {Math.floor(backgroundStatus.elapsedTime / 60)}m {backgroundStatus.elapsedTime % 60}s
-                        {backgroundStatus.estimatedRemaining && backgroundStatus.estimatedRemaining > 0 && (
-                          <span className="ml-2">
-                            | Còn lại: ~{Math.floor(backgroundStatus.estimatedRemaining / 60)}m {backgroundStatus.estimatedRemaining % 60}s
-                          </span>
-                        )}
+                        ⏱️ Đã chạy:{" "}
+                        {Math.floor(backgroundStatus.elapsedTime / 60)}m{" "}
+                        {backgroundStatus.elapsedTime % 60}s
+                        {backgroundStatus.estimatedRemaining &&
+                          backgroundStatus.estimatedRemaining > 0 && (
+                            <span className="ml-2">
+                              | Còn lại: ~
+                              {Math.floor(
+                                backgroundStatus.estimatedRemaining / 60
+                              )}
+                              m {backgroundStatus.estimatedRemaining % 60}s
+                            </span>
+                          )}
                       </span>
                     ) : (
                       <span>⏱️ Đang khởi động...</span>
@@ -568,9 +575,17 @@ const PhilosophyDashboard: React.FC = () => {
                   <div
                     className="bg-blue-600 h-2 rounded-full transition-all duration-1000"
                     style={{
-                      width: backgroundStatus.elapsedTime && backgroundStatus.estimatedRemaining
-                        ? `${Math.min(100, (backgroundStatus.elapsedTime / (backgroundStatus.elapsedTime + backgroundStatus.estimatedRemaining)) * 100)}%`
-                        : '0%'
+                      width:
+                        backgroundStatus.elapsedTime &&
+                        backgroundStatus.estimatedRemaining
+                          ? `${Math.min(
+                              100,
+                              (backgroundStatus.elapsedTime /
+                                (backgroundStatus.elapsedTime +
+                                  backgroundStatus.estimatedRemaining)) *
+                                100
+                            )}%`
+                          : "0%",
                     }}
                   />
                 </div>
