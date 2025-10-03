@@ -439,3 +439,16 @@ export interface IRateLimiterStats {
     memoryUsage: number;
   };
 }
+
+// 🔄 Background Generation Status Interface
+export interface IBackgroundGenerationStatus {
+  success: boolean;
+  message: string;
+  data: {
+    isGenerating: boolean;
+    elapsedTime?: number;
+    estimatedRemaining?: number;
+    startedAt?: number;
+    message: string;
+  };
+}

@@ -31,6 +31,7 @@ import {
   getMarxistPhilosophyLearningPath,
   clearPhilosophyError,
   clearPhilosophySuccess,
+  getBackgroundGenerationStatus,
 } from "@/services/features/marxist/philosophySlice";
 import { useNavigate } from "react-router-dom";
 import CustomLessonForm from "@/components/Philosophy/CustomLessonForm";
@@ -57,15 +58,21 @@ const PhilosophyDashboard: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   // const { user } = useAppSelector((state: RootState) => state.auth);
-  const { loading, error, success, learningPath, pagination } = useAppSelector(
-    (state: RootState) => state.philosophy
-  );
+  const { 
+    loading, 
+    error, 
+    success, 
+    learningPath, 
+    pagination, 
+    backgroundStatus 
+  } = useAppSelector((state: RootState) => state.philosophy);
 
   // Type assertion for learningPath items
   const typedLearningPath = learningPath as LearningPathItem[];
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [isGenerating, setIsGenerating] = useState(false); // 🔒 Lock to prevent duplicate generation
   const totalLessons = pagination?.totalItems ?? typedLearningPath.length;
 
   const fetchLearningPath = useCallback(
@@ -81,11 +88,20 @@ const PhilosophyDashboard: React.FC = () => {
 
   const navigateToLesson = useCallback(
     async (result: IGenerateMarxistPhilosophyLessonResponse) => {
+      console.log("🔄 [NAVIGATE] navigateToLesson called with result:", result);
+
       if (result.success && result.learningPath?.pathId) {
         const pathId = result.learningPath.pathId;
-        console.log("✅ Lesson created successfully, navigating to:", pathId);
+        console.log(
+          "✅ [NAVIGATE] Lesson created successfully, navigating to:",
+          pathId
+        );
 
         setTimeout(() => {
+          console.log(
+            "🔗 [NAVIGATE] Navigating to lesson:",
+            `/philosophy-lesson/${pathId}`
+          );
           window.location.href = `/philosophy-lesson/${pathId}`;
         }, 500);
         return;
@@ -136,7 +152,6 @@ const PhilosophyDashboard: React.FC = () => {
           }
 
           if (newestLesson?.pathId) {
-
             setTimeout(() => {
               window.location.href = `/philosophy-lesson/${newestLesson.pathId}`;
             }, 500);
@@ -159,13 +174,15 @@ const PhilosophyDashboard: React.FC = () => {
 
   const handleCustomLessonCreated = useCallback(
     async (result: IGenerateMarxistPhilosophyLessonResponse) => {
+      console.log("🎯 [CUSTOM] Custom lesson created successfully:", result);
+
       const lessonTitle = result.lesson?.title || "Bài học tuỳ chọn";
       const difficultyLabel = result.lesson?.difficultyLevel
         ? ` (Độ khó ${result.lesson.difficultyLevel})`
         : "";
 
       message.success({
-        content: `🎉 Bài học "${lessonTitle}" đã được tạo thành công${difficultyLabel}!`,
+        content: `🎉 [CUSTOM] Bài học tùy chọn "${lessonTitle}" đã được tạo thành công${difficultyLabel}!`,
         duration: 6,
       });
 
@@ -177,6 +194,21 @@ const PhilosophyDashboard: React.FC = () => {
   useEffect(() => {
     fetchLearningPath(page, pageSize);
   }, [fetchLearningPath, page, pageSize]);
+
+  // 🔄 Check background generation status periodically
+  useEffect(() => {
+    const checkBackgroundStatus = () => {
+      dispatch(getBackgroundGenerationStatus());
+    };
+
+    // Check immediately
+    checkBackgroundStatus();
+
+    // Check every 10 seconds when user is on the page
+    const interval = setInterval(checkBackgroundStatus, 10000);
+
+    return () => clearInterval(interval);
+  }, [dispatch]);
 
   useEffect(() => {
     if (!isInitialLoad) {
@@ -195,8 +227,18 @@ const PhilosophyDashboard: React.FC = () => {
   }, [isInitialLoad, pagination, page]);
 
   const handleGenerateLesson = async (options = {}) => {
+    // 🔒 Prevent duplicate calls
+    if (isGenerating) {
+      console.warn("⚠️ [AUTO-GEN] Generation already in progress, skipping...");
+      return;
+    }
+
     try {
-      console.log("🚀 Generating new Marxist Philosophy lesson...");
+      setIsGenerating(true);
+      console.log(
+        "🚀 [AUTO-GEN] Generating new Marxist Philosophy lesson with options:",
+        options
+      );
       console.log("📊 Current learning path state:", {
         totalLessons,
         completedLessons: typedLearningPath.filter((p) => p.completed).length,
@@ -206,14 +248,14 @@ const PhilosophyDashboard: React.FC = () => {
 
       // Show optimized loading message for performance improvements
       message.loading(
-        "🚀 Tạo bài học với AI System. Vui lòng chờ trong giây lát...",
+        "🚀 [AUTO-GEN] Tạo bài học dựa trên 3 bài học trước với AI System. Vui lòng chờ...",
         0
       );
 
       const result = await dispatch(
         generateMarxistPhilosophyLesson(options)
       ).unwrap();
-      console.log("✅ Lesson generated successfully:", result);
+      console.log("✅ [AUTO-GEN] Lesson generated successfully:", result);
       message.destroy(); // Clear loading message
 
       // Show enhanced AI provider info with performance metrics
@@ -221,7 +263,7 @@ const PhilosophyDashboard: React.FC = () => {
       const loadBalancerInfo = result.loadBalancer;
       const questionCount = result.lesson?.questionCount || 10;
 
-      let successMessage = `🚀 Bài học tạo thành công với ${questionCount} câu hỏi (AI: ${aiProvider})!`;
+      let successMessage = `🚀 [AUTO-GEN] Bài học tạo thành công với ${questionCount} câu hỏi (AI: ${aiProvider})!`;
       if (loadBalancerInfo) {
         successMessage += ` ⚡ Optimized: ${loadBalancerInfo.strategy} strategy`;
         if (loadBalancerInfo.providerAttempt) {
@@ -236,7 +278,7 @@ const PhilosophyDashboard: React.FC = () => {
 
       await navigateToLesson(result);
     } catch (err) {
-      console.error("❌ Error generating lesson:", err);
+      console.error("❌ [AUTO-GEN] Error generating lesson:", err);
       message.destroy(); // Clear loading message
 
       // Handle specific rate limiting, queue errors, and performance optimizations
@@ -263,9 +305,11 @@ const PhilosophyDashboard: React.FC = () => {
 
         const concentrationInfo = error.concentrationIssues;
         const distributionText = concentrationInfo?.distribution
-          ? `A:${concentrationInfo.distribution.A || 0}, B:${concentrationInfo.distribution.B || 0
-          }, C:${concentrationInfo.distribution.C || 0}, D:${concentrationInfo.distribution.D || 0
-          }`
+          ? `A:${concentrationInfo.distribution.A || 0}, B:${
+              concentrationInfo.distribution.B || 0
+            }, C:${concentrationInfo.distribution.C || 0}, D:${
+              concentrationInfo.distribution.D || 0
+            }`
           : "";
 
         message.error({
@@ -330,22 +374,25 @@ const PhilosophyDashboard: React.FC = () => {
       } else if (error?.statusCode === 503) {
         // System overload or AI service unavailable
         message.error({
-          content: `⚠️ Hệ thống đang quá tải. ${error.message || "Vui lòng thử lại sau giây lát."
-            }`,
+          content: `⚠️ Hệ thống đang quá tải. ${
+            error.message || "Vui lòng thử lại sau giây lát."
+          }`,
           duration: 6,
         });
       } else if (error?.statusCode === 429) {
         // Queue is full or rate limited
         message.warning({
-          content: `⏳ Hệ thống đang bận (Queue Management). ${error.message || "Vui lòng chờ và thử lại..."
-            }`,
+          content: `⏳ Hệ thống đang bận (Queue Management). ${
+            error.message || "Vui lòng chờ và thử lại..."
+          }`,
           duration: 8,
         });
       } else if (error?.statusCode === 408) {
         // Timeout - performance optimization kicked in
         message.error({
-          content: `⏱️ Timeout: ${error.message || "AI generation mất quá nhiều thời gian. Thử lại!"
-            }`,
+          content: `⏱️ Timeout: ${
+            error.message || "AI generation mất quá nhiều thời gian. Thử lại!"
+          }`,
           duration: 5,
         });
       } else if (error?.message?.includes("queue")) {
@@ -387,6 +434,9 @@ const PhilosophyDashboard: React.FC = () => {
 
       // Still refresh learning path to show any partial success
       fetchLearningPath(page, pageSize);
+    } finally {
+      // 🔓 Always reset generation lock
+      setIsGenerating(false);
     }
   };
 
@@ -491,6 +541,47 @@ const PhilosophyDashboard: React.FC = () => {
           />
         )}
 
+        {/* 🔄 Background Generation Status */}
+        {backgroundStatus?.isGenerating && (
+          <Alert
+            message="🤖 Background AI Generation đang chạy"
+            description={
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span>{backgroundStatus.message}</span>
+                  <div className="text-sm text-blue-600">
+                    {backgroundStatus.elapsedTime ? (
+                      <span>
+                        ⏱️ Đã chạy: {Math.floor(backgroundStatus.elapsedTime / 60)}m {backgroundStatus.elapsedTime % 60}s
+                        {backgroundStatus.estimatedRemaining && backgroundStatus.estimatedRemaining > 0 && (
+                          <span className="ml-2">
+                            | Còn lại: ~{Math.floor(backgroundStatus.estimatedRemaining / 60)}m {backgroundStatus.estimatedRemaining % 60}s
+                          </span>
+                        )}
+                      </span>
+                    ) : (
+                      <span>⏱️ Đang khởi động...</span>
+                    )}
+                  </div>
+                </div>
+                <div className="w-full bg-blue-100 rounded-full h-2">
+                  <div
+                    className="bg-blue-600 h-2 rounded-full transition-all duration-1000"
+                    style={{
+                      width: backgroundStatus.elapsedTime && backgroundStatus.estimatedRemaining
+                        ? `${Math.min(100, (backgroundStatus.elapsedTime / (backgroundStatus.elapsedTime + backgroundStatus.estimatedRemaining)) * 100)}%`
+                        : '0%'
+                    }}
+                  />
+                </div>
+              </div>
+            }
+            type="info"
+            showIcon
+            className="mb-6"
+          />
+        )}
+
         {error && !isTopicError && (
           <Alert
             message="Có lỗi xảy ra"
@@ -503,16 +594,16 @@ const PhilosophyDashboard: React.FC = () => {
                   error.includes("generation failed") ||
                   error.includes("JSON") ||
                   error.includes("timeout")) && (
-                    <Button
-                      type="primary"
-                      size="small"
-                      icon={<ReloadOutlined />}
-                      onClick={() => handleGenerateLesson()}
-                      loading={loading}
-                      className="mt-2 bg-red-600 hover:bg-red-700">
-                      🔄 Thử lại với AI
-                    </Button>
-                  )}
+                  <Button
+                    type="primary"
+                    size="small"
+                    icon={<ReloadOutlined />}
+                    onClick={() => handleGenerateLesson()}
+                    loading={loading || isGenerating}
+                    className="mt-2 bg-red-600 hover:bg-red-700">
+                    🔄 Thử lại với AI
+                  </Button>
+                )}
               </div>
             }
             type="error"
@@ -584,7 +675,7 @@ const PhilosophyDashboard: React.FC = () => {
                     size="large"
                     icon={<RocketOutlined />}
                     onClick={() => handleGenerateLesson()}
-                    loading={loading}
+                    loading={loading || isGenerating}
                     className="bg-red-600 hover:bg-red-700">
                     🤖 Tạo bài học đầu tiên với AI
                   </Button>
@@ -599,18 +690,20 @@ const PhilosophyDashboard: React.FC = () => {
                       <Card
                         key={item.pathId}
                         size="small"
-                        className={`border-l-4 ${item.completed
-                          ? "border-l-green-500 bg-green-50"
-                          : isNewest
+                        className={`border-l-4 ${
+                          item.completed
+                            ? "border-l-green-500 bg-green-50"
+                            : isNewest
                             ? "border-l-blue-500 bg-blue-50"
                             : "border-l-gray-300 bg-gray-50"
-                          } hover:shadow-md transition-all`}>
+                        } hover:shadow-md transition-all`}>
                         <div className="flex justify-between items-start">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
                               <span
-                                className={`text-lg ${item.completed ? "🎉" : isNewest ? "🚀" : "📚"
-                                  }`}>
+                                className={`text-lg ${
+                                  item.completed ? "🎉" : isNewest ? "🚀" : "📚"
+                                }`}>
                                 {item.completed ? "🎉" : isNewest ? "🚀" : "📚"}
                               </span>
                               <Title level={5} className="mb-0">
@@ -801,8 +894,7 @@ const PhilosophyDashboard: React.FC = () => {
                             window.location.href = `/philosophy-lesson/${nextIncompleteLesson.pathId}`;
                           }
                         }}
-                        className="bg-blue-600 hover:bg-blue-700"
-                      >
+                        className="bg-blue-600 hover:bg-blue-700">
                         📖 Tiếp tục học bài hiện tại
                       </Button>
                     </>
@@ -818,12 +910,14 @@ const PhilosophyDashboard: React.FC = () => {
                     block
                     icon={<RocketOutlined />}
                     onClick={() => handleGenerateLesson()}
-                    loading={loading}
-                    className="bg-red-600 hover:bg-red-700"
-                  >
+                    loading={loading || isGenerating}
+                    className="bg-red-600 hover:bg-red-700">
                     🤖 Tạo bài học với AI
                   </Button>
-                  <CustomLessonForm onLessonCreated={handleCustomLessonCreated} />
+                  <CustomLessonForm
+                    onLessonCreated={handleCustomLessonCreated}
+                    disabled={loading || isGenerating}
+                  />
                 </Space>
               </Card>
 

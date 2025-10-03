@@ -1,13 +1,5 @@
 import React, { useMemo, useState } from "react";
-import {
-  Alert,
-  Button,
-  Form,
-  Select,
-  Space,
-  Spin,
-  Typography,
-} from "antd";
+import { Alert, Button, Form, Select, Space, Spin, Typography } from "antd";
 import useMarxistTopics from "@/hooks/useMarxistTopics";
 import { createCustomLesson } from "@/services/features/marxist/philosophyApi";
 import { handleApiError } from "@/utils/errorHandler";
@@ -18,6 +10,7 @@ const { Option, OptGroup } = Select;
 
 interface CustomLessonFormProps {
   onLessonCreated?: (data: IGenerateMarxistPhilosophyLessonResponse) => void;
+  disabled?: boolean;
 }
 
 const difficultyOptions = [
@@ -30,15 +23,23 @@ const difficultyOptions = [
 
 const CustomLessonForm: React.FC<CustomLessonFormProps> = ({
   onLessonCreated,
+  disabled = false,
 }) => {
-  const { groupedTopics, loading: topicsLoading, error: topicError, refetch } =
-    useMarxistTopics();
+  const {
+    groupedTopics,
+    loading: topicsLoading,
+    error: topicError,
+    refetch,
+  } = useMarxistTopics();
   const [selectedTopic, setSelectedTopic] = useState<string>("");
   const [difficulty, setDifficulty] = useState<number>(2);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [formError, setFormError] = useState<string>("");
 
-  const topicGroups = useMemo(() => Object.entries(groupedTopics), [groupedTopics]);
+  const topicGroups = useMemo(
+    () => Object.entries(groupedTopics),
+    [groupedTopics]
+  );
 
   const handleSubmit = async () => {
     if (!selectedTopic) {
@@ -46,18 +47,25 @@ const CustomLessonForm: React.FC<CustomLessonFormProps> = ({
       return;
     }
 
+    console.log("🎯 [CUSTOM-FORM] Starting custom lesson creation:", {
+      selectedTopic,
+      difficulty,
+    });
     setSubmitting(true);
     setFormError("");
 
     try {
       const response = await createCustomLesson(selectedTopic, difficulty);
+      console.log("✅ [CUSTOM-FORM] Custom lesson API response:", response);
 
       if (response.success) {
+        console.log("🎉 [CUSTOM-FORM] Calling onLessonCreated callback");
         onLessonCreated?.(response);
         setSelectedTopic("");
         setDifficulty(2);
       }
     } catch (error) {
+      console.error("❌ [CUSTOM-FORM] Error creating custom lesson:", error);
       const message = handleApiError(error);
       setFormError(message);
     } finally {
@@ -69,9 +77,7 @@ const CustomLessonForm: React.FC<CustomLessonFormProps> = ({
     return (
       <div className="flex flex-col items-center justify-center py-8">
         <Spin size="large" />
-        <Text className="mt-4 text-gray-500">
-          Đang tải danh sách chủ đề...
-        </Text>
+        <Text className="mt-4 text-gray-500">Đang tải danh sách chủ đề...</Text>
       </div>
     );
   }
@@ -125,8 +131,7 @@ const CustomLessonForm: React.FC<CustomLessonFormProps> = ({
               size="large"
               showSearch
               optionFilterProp="children"
-              className="w-full"
-            >
+              className="w-full">
               {topicGroups.map(([chapterKey, chapter]) => (
                 <OptGroup key={chapterKey} label={chapter.title}>
                   {chapter.topics.map((topic) => (
@@ -143,8 +148,7 @@ const CustomLessonForm: React.FC<CustomLessonFormProps> = ({
             <Select
               value={difficulty}
               onChange={(value) => setDifficulty(Number(value))}
-              size="large"
-            >
+              size="large">
               {difficultyOptions.map((item) => (
                 <Option key={item.value} value={item.value}>
                   {item.label}
@@ -159,10 +163,13 @@ const CustomLessonForm: React.FC<CustomLessonFormProps> = ({
             size="large"
             block
             loading={submitting}
-            disabled={!topicGroups.length}
-            className="bg-red-600 hover:bg-red-700"
-          >
-            {submitting ? "Đang tạo bài học..." : "Tạo bài học"}
+            disabled={!topicGroups.length || disabled}
+            className="bg-red-600 hover:bg-red-700">
+            {submitting
+              ? "Đang tạo bài học..."
+              : disabled
+              ? "Auto-generation đang chạy..."
+              : "Tạo bài học"}
           </Button>
         </Form>
       </Space>

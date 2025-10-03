@@ -24,6 +24,7 @@ import {
   GET_MARXIST_PHILOSOPHY_GENERATION_STATS_ENDPOINT,
   GET_MARXIST_PHILOSOPHY_MULTI_AI_STATS_ENDPOINT,
   GET_MARXIST_PHILOSOPHY_RATE_LIMITER_STATS_ENDPOINT,
+  GET_MARXIST_PHILOSOPHY_BACKGROUND_STATUS_ENDPOINT,
 } from "@/services/constant/apiConfig";
 import {
   IMarxistPhilosophyTopic,
@@ -41,6 +42,7 @@ import {
   IGenerateContentPackResponse,
   IGenerateLessonFromContentPayload,
   IContentPack,
+  IBackgroundGenerationStatus,
 } from "@/interfaces/IMarxist";
 import { ILesson } from "@/interfaces/ILesson";
 
@@ -83,6 +85,14 @@ interface PhilosophyState {
       timestamp: number;
     };
   };
+  // 🔄 Background Generation Status
+  backgroundStatus: {
+    isGenerating: boolean;
+    elapsedTime?: number;
+    estimatedRemaining?: number;
+    startedAt?: number;
+    message?: string;
+  };
 }
 
 const initialState: PhilosophyState = {
@@ -105,6 +115,10 @@ const initialState: PhilosophyState = {
     },
     lastTest: undefined,
     loadBalancerStats: undefined,
+  },
+  backgroundStatus: {
+    isGenerating: false,
+    message: "No background generation in progress",
   },
 };
 
@@ -517,6 +531,17 @@ export const getRateLimiterStats = createAsyncThunk(
   }
 );
 
+// 🔄 Get Background Generation Status
+export const getBackgroundGenerationStatus = createAsyncThunk(
+  "philosophy/getBackgroundGenerationStatus",
+  async () => {
+    const response = await axiosInstance.get(
+      GET_MARXIST_PHILOSOPHY_BACKGROUND_STATUS_ENDPOINT
+    );
+    return response.data as IBackgroundGenerationStatus;
+  }
+);
+
 const philosophySlice = createSlice({
   name: "philosophy",
   initialState,
@@ -739,6 +764,21 @@ const philosophySlice = createSlice({
       })
       .addCase(testMarxistPhilosophyGeminiAPI.fulfilled, (state, action) => {
         state.success = action.payload.message;
+      })
+
+      // 🔄 Background Generation Status
+      .addCase(getBackgroundGenerationStatus.fulfilled, (state, action) => {
+        state.backgroundStatus = {
+          isGenerating: action.payload.data.isGenerating,
+          elapsedTime: action.payload.data.elapsedTime,
+          estimatedRemaining: action.payload.data.estimatedRemaining,
+          startedAt: action.payload.data.startedAt,
+          message: action.payload.data.message,
+        };
+      })
+      .addCase(getBackgroundGenerationStatus.rejected, (_, action) => {
+        console.error("Failed to get background generation status:", action.error.message);
+        // Keep current state if API fails
       });
   },
 });

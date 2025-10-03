@@ -1,5 +1,5 @@
-export const BASE_URL = "https://octopus-app-ebuoh.ondigitalocean.app/api";
-// export const BASE_URL = "http://localhost:8080/api";
+// export const BASE_URL = "https://octopus-app-ebuoh.ondigitalocean.app/api";
+export const BASE_URL = "http://localhost:8080/api";
 //auth
 export const LOGIN_ENDPOINT = `${BASE_URL}/auth/login`;
 export const REGISTER_ENDPOINT = `${BASE_URL}/auth/register`;
@@ -108,6 +108,9 @@ export const GET_AVAILABLE_MARXIST_PHILOSOPHY_TOPICS_ENDPOINT = `${BASE_URL}/mar
 export const ANALYZE_MARXIST_PHILOSOPHY_PROGRESS_ENDPOINT = `${BASE_URL}/marxist-philosophy/analyze-progress`;
 export const TEST_MARXIST_PHILOSOPHY_CONNECTION_ENDPOINT = `${BASE_URL}/marxist-philosophy/test-connection`;
 export const TEST_MARXIST_PHILOSOPHY_GEMINI_ENDPOINT = `${BASE_URL}/marxist-philosophy/test-gemini`;
+
+// 🔄 Background Generation Status
+export const GET_MARXIST_PHILOSOPHY_BACKGROUND_STATUS_ENDPOINT = `${BASE_URL}/marxist-philosophy/background-status`;
 
 // ⚡ Performance Monitoring Endpoints (Admin/Staff only)
 export const GET_MARXIST_PHILOSOPHY_GENERATION_STATS_ENDPOINT = `${BASE_URL}/marxist-philosophy/generation-stats`;
