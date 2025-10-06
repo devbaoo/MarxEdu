@@ -11,13 +11,13 @@ const { TextArea } = Input;
 
 const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
 const OPENROUTER_MODEL =
-  import.meta.env.VITE_OPENROUTER_MODEL || "x-ai/grok-4-fast:free";
+  import.meta.env.VITE_OPENROUTER_MODEL || "qwen/qwen3-coder:free";
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 
 const SYSTEM_PROMPT =
   "Bạn là chuyên gia về triết học Mác Lê Nin, giúp tôi trả lời các câu hỏi về chủ đề này. Luôn trả lời toàn bộ bằng tiếng Việt.";
 
-async function askGrok(prompt: string): Promise<string> {
+async function askQwen(prompt: string): Promise<string> {
   if (!OPENROUTER_API_KEY) {
     return "Chưa cấu hình khóa API OpenRouter.";
   }
@@ -51,7 +51,7 @@ async function askGrok(prompt: string): Promise<string> {
     if (!res.ok) {
       const errorText = await res.text();
       console.error("OpenRouter error", res.status, errorText);
-      return "Không thể kết nối tới Grok. Vui lòng thử lại.";
+      return "Không thể kết nối tới Qwen3 Coder. Vui lòng thử lại.";
     }
     const data = await res.json();
     // OpenRouter trả về dạng: { choices: [{ message: { content: "..." | [{type,text}...] } }] }
@@ -61,7 +61,9 @@ async function askGrok(prompt: string): Promise<string> {
     }
     if (Array.isArray(messageContent)) {
       const combinedText = messageContent
-        .filter((part) => part?.type === "text" && typeof part.text === "string")
+        .filter(
+          (part) => part?.type === "text" && typeof part.text === "string"
+        )
         .map((part) => part.text as string)
         .join("\n\n");
       return combinedText.trim() || "Không có phản hồi từ AI.";
@@ -69,7 +71,7 @@ async function askGrok(prompt: string): Promise<string> {
     return "Không có phản hồi từ AI.";
   } catch (error) {
     console.error("askGrok error", error);
-    return "Lỗi khi gửi câu hỏi đến Grok.";
+    return "Lỗi khi gửi câu hỏi đến Qwen3 Coder.";
   }
 }
 
@@ -88,7 +90,7 @@ const ChatboxGemini: React.FC = () => {
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setLoading(true);
-    const aiReply = await askGrok(userMsg.content);
+    const aiReply = await askQwen(userMsg.content);
     // Chèn xuống dòng trước mỗi dấu * hoặc ** để dễ nhìn hơn
     let formattedReply = aiReply.replace(/(\*\*?)/g, "\n$1");
     // Định dạng: **Tiêu đề:** => <strong>Tiêu đề:</strong>, * Bullet => <li>Bullet</li>
@@ -153,8 +155,7 @@ const ChatboxGemini: React.FC = () => {
             background: "white",
             display: "flex",
             flexDirection: "column",
-          }}
-        >
+          }}>
           <Card
             title={
               <span>
@@ -166,8 +167,7 @@ const ChatboxGemini: React.FC = () => {
                 <Button
                   type="text"
                   onClick={() => setMessages([])}
-                  style={{ marginRight: 4 }}
-                >
+                  style={{ marginRight: 4 }}>
                   Xoá lịch sử
                 </Button>
                 <Button
@@ -185,8 +185,10 @@ const ChatboxGemini: React.FC = () => {
               background: "#fafbfc",
             }}
             style={{ margin: 0, borderRadius: 16, border: "none" }}
-            headStyle={{ borderRadius: "16px 16px 0 0", background: "#f5f5f5" }}
-          >
+            headStyle={{
+              borderRadius: "16px 16px 0 0",
+              background: "#f5f5f5",
+            }}>
             <div style={{ minHeight: 120 }}>
               {messages.length === 0 && (
                 <div
@@ -194,8 +196,7 @@ const ChatboxGemini: React.FC = () => {
                     color: "#888",
                     textAlign: "center",
                     margin: "32px 0",
-                  }}
-                >
+                  }}>
                   <MessageOutlined style={{ fontSize: 32, marginBottom: 8 }} />
                   <div>Hỏi AI về Triết học Mác Lê Nin hoặc bất cứ điều gì!</div>
                 </div>
@@ -206,8 +207,7 @@ const ChatboxGemini: React.FC = () => {
                   style={{
                     margin: "8px 0",
                     textAlign: msg.role === "user" ? "right" : "left",
-                  }}
-                >
+                  }}>
                   <div
                     style={{
                       display: "inline-block",
@@ -221,8 +221,7 @@ const ChatboxGemini: React.FC = () => {
                     }}
                     dangerouslySetInnerHTML={
                       msg.role === "ai" ? { __html: msg.content } : undefined
-                    }
-                  >
+                    }>
                     {msg.role === "user" ? msg.content : null}
                   </div>
                 </div>
@@ -236,8 +235,7 @@ const ChatboxGemini: React.FC = () => {
               borderTop: "1px solid #f0f0f0",
               background: "#fff",
               borderRadius: "0 0 16px 16px",
-            }}
-          >
+            }}>
             <Input.Group compact>
               <TextArea
                 value={input}
@@ -248,7 +246,7 @@ const ChatboxGemini: React.FC = () => {
                     handleSend();
                   }
                 }}
-                placeholder="Nhập câu hỏi cho Grok 4..."
+                placeholder="Nhập câu hỏi cho Qwen3 Coder..."
                 autoSize={{ minRows: 1, maxRows: 4 }}
                 disabled={loading}
                 style={{ width: "calc(100% - 48px)", marginRight: 8 }}
