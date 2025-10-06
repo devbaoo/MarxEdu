@@ -11,7 +11,7 @@ const { TextArea } = Input;
 
 const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
 const OPENROUTER_MODEL =
-  import.meta.env.VITE_OPENROUTER_MODEL || "qwen/qwen3-coder:free";
+  import.meta.env.VITE_OPENROUTER_MODEL || "qwen/qwen2.5-vl-72b-instruct:free";
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 
 const SYSTEM_PROMPT =
